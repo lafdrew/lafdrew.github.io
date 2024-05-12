@@ -174,7 +174,7 @@
 <div id="banner" class="banner" parallax=true
      style="background: url('/img/1.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
-    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0)">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.7)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
@@ -213,7 +213,13 @@
   <div class="row mx-auto index-card">
     
     
-    <article class="col-12 col-md-12 mx-auto index-info">
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/05/12/r2-%E4%BD%BF%E7%94%A8/" target="_self">
+          <img src="/img/3.png" srcset="/img/loading.gif" lazyload alt="Radare2--linux系统下的动态调试工具">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
       <h2 class="index-header">
         
         <a href="/2024/05/12/r2-%E4%BD%BF%E7%94%A8/" target="_self">
@@ -222,7 +228,7 @@
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/12/r2-%E4%BD%BF%E7%94%A8/" target="_self">
+      <a class="index-excerpt " href="/2024/05/12/r2-%E4%BD%BF%E7%94%A8/" target="_self">
         <div>
           需要进行linux文件的动态调试(其实是懒得分析静态逻辑),但是linux平台不晓得有没有什么特别好的调试工具,所以学习一下Radare2,顺便记录指令，方便以后查阅 让r2自动分析可执行文件1r2 -A ./fileName 获取一些基本的二进制信息1iI  查看导入和导出函数12ii    //查看导入函数iE    //查看到处函数  查看函数1afl       // function l
         </div>
