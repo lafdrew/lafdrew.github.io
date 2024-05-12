@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="en" data-default-color-scheme=auto>
+<html lang="en" >
 
 
 
@@ -16,21 +16,21 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="测试12#include &lt;iostream&gt;cout &lt;&lt; endl;">
+    <meta name="description" content="需要进行linux文件的动态调试(其实是懒得分析静态逻辑),但是linux平台不晓得有没有什么特别好的调试工具,所以学习一下Radare2,顺便记录指令，方便以后查阅 让r2自动分析可执行文件1r2 -A .&#x2F;fileName 获取一些基本的二进制信息1iI  查看导入和导出函数12ii    &#x2F;&#x2F;查看导入函数iE    &#x2F;&#x2F;查看到处函数  查看函数1afl       &#x2F;&#x2F; function l">
 <meta property="og:type" content="article">
-<meta property="og:title" content="测试">
-<meta property="og:url" content="https://lafdrew.github.io/2024/05/09/%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:title" content="Radare2--linux系统下的动态调试工具">
+<meta property="og:url" content="https://lafdrew.github.io/2024/05/12/r2-%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="测试12#include &lt;iostream&gt;cout &lt;&lt; endl;">
+<meta property="og:description" content="需要进行linux文件的动态调试(其实是懒得分析静态逻辑),但是linux平台不晓得有没有什么特别好的调试工具,所以学习一下Radare2,顺便记录指令，方便以后查阅 让r2自动分析可执行文件1r2 -A .&#x2F;fileName 获取一些基本的二进制信息1iI  查看导入和导出函数12ii    &#x2F;&#x2F;查看导入函数iE    &#x2F;&#x2F;查看到处函数  查看函数1afl       &#x2F;&#x2F; function l">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-05-09T11:15:14.000Z">
-<meta property="article:modified_time" content="2024-05-09T11:15:53.061Z">
+<meta property="article:published_time" content="2024-05-12T14:52:21.000Z">
+<meta property="article:modified_time" content="2024-05-12T16:31:38.952Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>测试 - Hexo</title>
+  <title>Radare2--linux系统下的动态调试工具 - Hexo</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -58,8 +58,6 @@
 
 
   <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
-  
-    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
   
 
 
@@ -176,12 +174,6 @@
           
         
         
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
-              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
-            </a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -196,7 +188,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="测试"></span>
+            <span id="subtitle" data-typed-text="Radare2--linux系统下的动态调试工具"></span>
           
         </div>
 
@@ -207,8 +199,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-05-09 19:15" pubdate>
-          May 9, 2024 pm
+        <time datetime="2024-05-12 22:52" pubdate>
+          May 12, 2024 pm
         </time>
       </span>
     
@@ -219,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          11 words
+          340 words
         
       </span>
     
@@ -230,7 +222,7 @@
         
         
         
-          1 mins
+          3 mins
         
       </span>
     
@@ -267,18 +259,65 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">测试</h1>
+            <h1 id="seo-header">Radare2--linux系统下的动态调试工具</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br>cout &lt;&lt; endl;<br></code></pre></td></tr></table></figure>
+                <p>需要进行linux文件的动态调试(其实是懒得分析静态逻辑),但是linux平台不晓得有没有什么特别好的调试工具,所以学习一下Radare2,顺便记录指令，方便以后查阅</p>
+<h2 id="让r2自动分析可执行文件"><a href="#让r2自动分析可执行文件" class="headerlink" title="让r2自动分析可执行文件"></a>让r2自动分析可执行文件</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">r2 -A ./fileName<br></code></pre></td></tr></table></figure>
+<h2 id="获取一些基本的二进制信息"><a href="#获取一些基本的二进制信息" class="headerlink" title="获取一些基本的二进制信息"></a>获取一些基本的二进制信息</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">iI<br></code></pre></td></tr></table></figure>
+
+<h2 id="查看导入和导出函数"><a href="#查看导入和导出函数" class="headerlink" title="查看导入和导出函数"></a>查看导入和导出函数</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">ii    //查看导入函数<br>iE    //查看到处函数<br></code></pre></td></tr></table></figure>
+
+<h2 id="查看函数"><a href="#查看函数" class="headerlink" title="查看函数"></a>查看函数</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">afl       // <span class="hljs-keyword">function</span> list<br></code></pre></td></tr></table></figure>
+
+<h2 id="交叉引用"><a href="#交叉引用" class="headerlink" title="交叉引用"></a>交叉引用</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">axt  函数名<br>axt 地址<br></code></pre></td></tr></table></figure>
+
+<h2 id="寻找定位"><a href="#寻找定位" class="headerlink" title="寻找定位"></a>寻找定位</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">s 地址或函数名<br></code></pre></td></tr></table></figure>
+
+<h2 id="十六进制视图"><a href="#十六进制视图" class="headerlink" title="十六进制视图"></a>十六进制视图</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">px<br></code></pre></td></tr></table></figure>
+
+<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">s 函数名   //找到函数 或地址<br>pdf <br></code></pre></td></tr></table></figure>
+
+<h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">iz   //显示程序中的字符串<br></code></pre></td></tr></table></figure>
+
+<h2 id="可视模式"><a href="#可视模式" class="headerlink" title="可视模式"></a>可视模式</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">VV <br></code></pre></td></tr></table></figure>
+
+<p><strong>目前为止，还都只是静态调试，我把这些称为鸡肋命令，因为ida完全可以替代，接下来才是关键</strong></p>
+<h2 id="启动调试器"><a href="#启动调试器" class="headerlink" title="启动调试器"></a>启动调试器</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">-d //启动调试器<br>db //添加断点<br>dbi //查看断点<br>dc //开始运行<br>dbt //查看堆栈<br>drr //转存寄存器<br></code></pre></td></tr></table></figure>
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>需要下载一个插件r2dec</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">r2pm install r2dec<br>r2pm -l //查看下载的插件<br>pdda   //反编译指令<br><br></code></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>总的来说基本能实现x64dbg功能，但是命令行会有一些不方便,虽然ida也支持远程动态调试，但我总是配置不好，也不太懂附加进程调试，所以先用一下r2试一下</p>
+
                 
               </div>
             
             <hr/>
             <div>
               <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RE/" class="category-chain-item">RE</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
   
   
 </div>
@@ -289,8 +328,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>测试</div>
-      <div>https://lafdrew.github.io/2024/05/09/测试/</div>
+      <div>Radare2--linux系统下的动态调试工具</div>
+      <div>https://lafdrew.github.io/2024/05/12/r2-使用/</div>
     </div>
     <div class="license-meta">
       
@@ -302,7 +341,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>May 9, 2024</div>
+          <div>May 12, 2024</div>
         </div>
       
       
@@ -337,12 +376,6 @@
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2024/05/09/hello/" title="">
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">Next</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>
