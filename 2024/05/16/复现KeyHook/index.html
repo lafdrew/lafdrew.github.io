@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="复现《逆向工程核心原理》Hook简介利用Hook，我们可以查看，修改，截断 ‘用户-os-应用程序’ 之间所有的信息 接下来以keyBoard为例，实际操作一下，目的是向notepad.exe中注入KeyHook.dll实现键盘输入的钩取 函数总览mainHookMain.cpp &#x2F;&#x2F;注入函数 123456789101112131415161718192021222324252">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复现KeyHook">
+<meta property="og:url" content="https://lafdrew.github.io/2024/05/16/%E5%A4%8D%E7%8E%B0KeyHook/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="复现《逆向工程核心原理》Hook简介利用Hook，我们可以查看，修改，截断 ‘用户-os-应用程序’ 之间所有的信息 接下来以keyBoard为例，实际操作一下，目的是向notepad.exe中注入KeyHook.dll实现键盘输入的钩取 函数总览mainHookMain.cpp &#x2F;&#x2F;注入函数 123456789101112131415161718192021222324252">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://lafdrew.github.io/img/3.1.png">
+<meta property="article:published_time" content="2024-05-16T15:49:59.000Z">
+<meta property="article:modified_time" content="2024-05-17T14:03:20.301Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lafdrew.github.io/img/3.1.png">
+  
+  
+  
+  <title>复现KeyHook - Hexo</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"lafdrew.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>lafdrew的小站</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="复现KeyHook"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-16 23:49" pubdate>
+          May 16, 2024 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">复现KeyHook</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="复现《逆向工程核心原理》Hook"><a href="#复现《逆向工程核心原理》Hook" class="headerlink" title="复现《逆向工程核心原理》Hook"></a>复现《逆向工程核心原理》Hook</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>利用Hook，我们可以查看，修改，截断 ‘用户-os-应用程序’ 之间所有的信息<br><img src="/../res/3.1.png" srcset="/img/loading.gif" lazyload alt="示意图"></p>
+<p>接下来以keyBoard为例，实际操作一下，目的是<strong>向notepad.exe中注入KeyHook.dll实现键盘输入的钩取</strong></p>
+<h2 id="函数总览"><a href="#函数总览" class="headerlink" title="函数总览"></a>函数总览</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><p>HookMain.cpp &#x2F;&#x2F;注入函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&quot;stdio.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&quot;Windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&quot;conio.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DLL_NAME <span class="hljs-string">&quot;KeyHook.dll&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> HOOKSTART <span class="hljs-string">&quot;HookStart&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> HOOKSTOP <span class="hljs-string">&quot;HookStop&quot;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">typedef</span> <span class="hljs-title">void</span><span class="hljs-params">(*FN_HOOKSTART)</span><span class="hljs-params">()</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">typedef</span> <span class="hljs-title">void</span><span class="hljs-params">(*FN_HOOKSTOP)</span><span class="hljs-params">()</span></span>;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    HMODULE hDll = <span class="hljs-literal">NULL</span>;<br>    FN_HOOKSTART HookStart = <span class="hljs-literal">NULL</span>;<br>    FN_HOOKSTOP HookStop = <span class="hljs-literal">NULL</span>;<br><br>    hDll = <span class="hljs-built_in">LoadLibraryA</span>(DLL_NAME);<br><br>    HookStart = (FN_HOOKSTART)<span class="hljs-built_in">GetProcAddress</span>(hDll, HOOKSTART);<br>    HookStop = (FN_HOOKSTOP)<span class="hljs-built_in">GetProcAddress</span>(hDll, HOOKSTOP);<br><br>    <span class="hljs-built_in">HookStart</span>();<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;press &#x27;q&#x27; to quit this hook procdure&quot;</span>);<br>    <span class="hljs-keyword">while</span> (_getch() != <span class="hljs-string">&#x27;q&#x27;</span>);<br><br>    <span class="hljs-built_in">HookStop</span>();<br><br>    <span class="hljs-built_in">FreeLibrary</span>(hDll);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="dll"><a href="#dll" class="headerlink" title="dll"></a>dll</h3><p>KeyHook.cpp   &#x2F;&#x2F;dll实现函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;stdio.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fstream&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PROCESS_NAME <span class="hljs-string">&quot;notepad.exe&quot;</span></span><br><br>HINSTANCE g_hInstance = <span class="hljs-literal">NULL</span>;<br>HHOOK g_Hook = <span class="hljs-literal">NULL</span>;<br>HWND g_hWnd = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">DllMain</span><span class="hljs-params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">switch</span> (fdwReason)<br>    &#123;<br>    <span class="hljs-keyword">case</span> DLL_PROCESS_ATTACH:<br>        g_hInstance = hinstDLL;<br>        <br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> DLL_PROCESS_DETACH:<br>        <br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">default</span>:<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> TRUE;<br>&#125;<br><br><span class="hljs-function">LRESULT CALLBACK <span class="hljs-title">KeyboardProc</span><span class="hljs-params">(<span class="hljs-type">int</span> nCode, WPARAM wParam, LPARAM lParam)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">char</span> szPath[MAX_PATH] = &#123; <span class="hljs-number">0</span>, &#125;;<br>    <span class="hljs-type">char</span>* p = <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-keyword">if</span> (nCode &gt;= <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (!(lParam &amp; <span class="hljs-number">0x80000000</span>))<br>        &#123;<br>            <span class="hljs-built_in">GetModuleFileNameA</span>(<span class="hljs-literal">NULL</span>, szPath, MAX_PATH);<br>            p = <span class="hljs-built_in">strrchr</span>(szPath, <span class="hljs-string">&#x27;\\&#x27;</span>);<br><br>            <span class="hljs-keyword">if</span> (!_stricmp(p + <span class="hljs-number">1</span>, PROCESS_NAME))<br>            &#123;<br>                <br>                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>            &#125;<br>            <br><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">CallNextHookEx</span>(g_Hook, nCode, wParam, lParam);<br>&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br>    __declspec(dllexport) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">HookStart</span><span class="hljs-params">()</span></span><br><span class="hljs-function">    </span>&#123;<br>        g_Hook = <span class="hljs-built_in">SetWindowsHookEx</span>(WH_KEYBOARD, KeyboardProc, g_hInstance, <span class="hljs-number">0</span>);<br>    &#125;<br>    __declspec(dllexport) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">HookStop</span><span class="hljs-params">()</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">if</span> (g_Hook)<br>        &#123;<br>            <span class="hljs-built_in">UnhookWindowsHookEx</span>(g_Hook);<br>            g_Hook = <span class="hljs-literal">NULL</span>;<br>        &#125;<br>    &#125;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br>&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="逐块解释"><a href="#逐块解释" class="headerlink" title="逐块解释"></a>逐块解释</h2><h3 id="dll-1"><a href="#dll-1" class="headerlink" title="dll"></a>dll</h3><p>下面逐块解释一下代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp">HINSTANCE g_hInstance = <span class="hljs-literal">NULL</span>;  <span class="hljs-comment">//实例化对象指针</span><br>HHOOK g_Hook = <span class="hljs-literal">NULL</span>; <span class="hljs-comment">//钩子指针</span><br>HWND g_hWnd = <span class="hljs-literal">NULL</span>; <span class="hljs-comment">//窗口指针</span><br><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">DllMain</span><span class="hljs-params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">// Perform actions based on the reason for calling.</span><br>    <span class="hljs-keyword">switch</span> (fdwReason)<br>    &#123;<br>    <span class="hljs-keyword">case</span> DLL_PROCESS_ATTACH:<br>        g_hInstance = hinstDLL;  <span class="hljs-comment">//初始化</span><br>        <br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> DLL_PROCESS_DETACH:<br>        <br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">default</span>:<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> TRUE;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这是DLL的程序入口，是一种框架代码，一般的Dll都会这样写。<br>程序会根据fdwReason的值执行不同的函数，fdwReason有四种取值</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">fdwReason 0 DLL_PROCESS_ATTACH  //DLL被加载<br>fdwReason 1 DLL_PROCESS_DETACH  //DLL被卸载<br>fdwReason 2 DLL_THREAD_ATTACH  //创建进程时<br>fdwReason 3 DLL_THREAD_DETACH  //卸载进程时<br></code></pre></td></tr></table></figure>
+
+<p>当fdwReason为DLL_PROCESS_ATTACH时， lpvReserved为NULL表示动态加载，不为NULL表示静态加载。当fdwReason为DLL_PROCESS_DETACH时, lpvReserved为NULL表示FreeLibrary被调用或DLL加载失败，不为NULL表示进程正在终止。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">LRESULT CALLBACK <span class="hljs-title">KeyboardProc</span><span class="hljs-params">(<span class="hljs-type">int</span> nCode, WPARAM wParam, LPARAM lParam)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">//KeyboardProc 是一个回调函数，会作为SetWindowsHookEx的参数，具体处理Hook到的信息</span><br>    <span class="hljs-comment">//ncode参数决定如何处理这个消息</span><br>    <span class="hljs-comment">//wParam 以这个程序为例，存放虚拟键码</span><br>    <span class="hljs-comment">//lParam 存在一些标志，如按下和取消等等</span><br>    <span class="hljs-type">char</span> szPath[MAX_PATH] = &#123; <span class="hljs-number">0</span>, &#125;;<br>    <span class="hljs-type">char</span>* p = <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-keyword">if</span> (nCode &gt;= <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (!(lParam &amp; <span class="hljs-number">0x80000000</span>))  <span class="hljs-comment">//lParam的31bit代表是否按下</span><br>        &#123;<br>            <span class="hljs-built_in">GetModuleFileNameA</span>(<span class="hljs-literal">NULL</span>, szPath, MAX_PATH);<br>            p = <span class="hljs-built_in">strrchr</span>(szPath, <span class="hljs-string">&#x27;\\&#x27;</span>);<br>            <span class="hljs-comment">//拿到进程名字，这个函数是定位到字符出现的最后一个位置</span><br>            <span class="hljs-keyword">if</span> (!_stricmp(p + <span class="hljs-number">1</span>, PROCESS_NAME))<br>            &#123;<br>                <br>                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>            &#125;<br>            <br><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">CallNextHookEx</span>(g_Hook, nCode, wParam, lParam);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这个函数将作为SetWindowsHookEx函数的一个参数，负责处理Hook到的消息，通俗的来讲，你要对截获的信息进行处理，可以是舍弃，变更，修改等等，所以要写一个函数来实现，对于这个程序，功能为判断这个输入是否是在notepad.exe进程中，如果是就不向下传递，如果不是就调用CallNextHookEx(),将信息传递下去。</p>
+<p>ncode参数</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">小于0：必须调用CallNextHookEx函数传递消息<br>0：表示参数wParam和lParam 包含关于虚拟键值相关信息<br>3：在值为0的基础上，表示这个消息被某个进程用PeekMessage查看过<br></code></pre></td></tr></table></figure>
+<p>也就是当ncode&gt;0的时候，可以对进行操作，否则只能传递钩子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br>    __declspec(dllexport) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">HookStart</span><span class="hljs-params">()</span></span><br><span class="hljs-function">    </span>&#123;<br>        g_Hook = <span class="hljs-built_in">SetWindowsHookEx</span>(WH_KEYBOARD, KeyboardProc, g_hInstance, <span class="hljs-number">0</span>);<br>    &#125;<br>    __declspec(dllexport) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">HookStop</span><span class="hljs-params">()</span></span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">if</span> (g_Hook)<br>        &#123;<br>            <span class="hljs-built_in">UnhookWindowsHookEx</span>(g_Hook);<br>            g_Hook = <span class="hljs-literal">NULL</span>;<br>        &#125;<br>    &#125;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br>&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br></code></pre></td></tr></table></figure>
+
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br><span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br>...<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> __cplusplus</span><br>&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span> <span class="hljs-comment">// __cplusplus</span></span><br></code></pre></td></tr></table></figure>
+
+<p>有些函数只能在c语言下解析，但是dll源文件是cpp，这个就是告诉编译器什么时候再c语言下解析，什么时候再cpp下解析。</p>
+<p>__declspec(dllexport) 标志导出函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">HHOOK <span class="hljs-title">SetWindowsHookExA</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">  [in] <span class="hljs-type">int</span>       idHook,  <span class="hljs-comment">//标识钩子的种类 WH_KEYBOARD为键盘钩子</span></span></span><br><span class="hljs-params"><span class="hljs-function">  [in] HOOKPROC  lpfn,    <span class="hljs-comment">//函数指针，这个参数填之前写好的回调函数</span></span></span><br><span class="hljs-params"><span class="hljs-function">  [in] HINSTANCE hmod,    <span class="hljs-comment">//实例</span></span></span><br><span class="hljs-params"><span class="hljs-function">  [in] DWORD     dwThreadId  <span class="hljs-comment">//如果当前的钩子进程与现存的线程相关，那么它的值就是0</span></span></span><br><span class="hljs-params"><span class="hljs-function">)</span></span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="main-1"><a href="#main-1" class="headerlink" title="main"></a>main</h3><p>主函数较为简单<br>LoadLibraryA 加载dll<br>GetProcAddress 获取dll中的函数地址</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>测试环境 : win10,xp</p>
+<p>看到网上说win10环境下会出现问题，但是我自己试的的时候好像没什么问题。两种测试环境大同小异，win10要编译成64位可执行程序，xp编译成32位可执行程序即可。我这里使用g++编译器</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stylus">g++ -shared ./KeyHook<span class="hljs-selector-class">.cpp</span> -o KeyHook<span class="hljs-selector-class">.dll</span> <span class="hljs-comment">// -shared 表示要生成dll文件，-o 后跟dll的名字</span><br><br>g++ ./KeyHook<span class="hljs-selector-class">.dll</span> hookMain<span class="hljs-selector-class">.cpp</span> -o KeyHook<span class="hljs-selector-class">.exe</span> <span class="hljs-comment">//生成exe文件</span><br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/../res/3.3.png" srcset="/img/loading.gif" lazyload alt="效果"> </p>
+<p>生成这两个文件，说明成功</p>
+<p>先运行exe文件，后打开notepad</p>
+<p><img src="/../res/3.4.png" srcset="/img/loading.gif" lazyload alt="打开notepad"><br>此时键盘输入无效，打开进程管理工具发现KeyHook.dll成功注入</p>
+<p><img src="/../res/3.5.png" srcset="/img/loading.gif" lazyload alt="注入成功"></p>
+<p>xp 平台测试与win10类似，gcc要用32位版本，而且似乎xp并不支持在当前路劲打开cmd，要用绝对路径。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>wParam 中包含虚拟键码的信息，应该能把按下的键位打印出来，但是我网上找了些函数，但似乎都没有起效果(是确实没起效果)</p>
+<p>对win32核心编程不太熟悉，第一次看这里感觉有点头大，但其实逻辑并不难。</p>
+<p>一开始函数有个地方写错了，win10注入一直失败，看到网上说win10好像有某种保护措施，所以去尝试了xp，但最后发现win10也是可以的。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RE/" class="category-chain-item">RE</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>复现KeyHook</div>
+      <div>https://lafdrew.github.io/2024/05/16/复现KeyHook/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>John Doe</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>May 16, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/14/%E5%9F%BA%E4%BA%8E/" title="sql注入简单防御 -- 完善cpp课程设计">
+                        <span class="hidden-mobile">sql注入简单防御 -- 完善cpp课程设计</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script>
+  <link defer rel="stylesheet" href="/css/backgroundize.css" />
+  <!-- hexo injector body_end end --></body>
+</html>
