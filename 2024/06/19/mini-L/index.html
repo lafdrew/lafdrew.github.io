@@ -1,0 +1,651 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="mini-L 部分题目(longlongcall,bigbanana)longlongcall分析64位 ELF 无壳 有大量类似这样反汇编失败的函数，是一个call&amp;ret类型的花指令,可以看出popfq和pushfq中间的才是有用的指令。 exp将无关的指令nop掉 123456789101112131415161718192021222324252627282930313233343">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mini-L">
+<meta property="og:url" content="https://lafdrew.github.io/2024/06/19/mini-L/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="mini-L 部分题目(longlongcall,bigbanana)longlongcall分析64位 ELF 无壳 有大量类似这样反汇编失败的函数，是一个call&amp;ret类型的花指令,可以看出popfq和pushfq中间的才是有用的指令。 exp将无关的指令nop掉 123456789101112131415161718192021222324252627282930313233343">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://lafdrew.github.io/img/%E9%A6%99%E8%95%89.png">
+<meta property="article:published_time" content="2024-06-18T17:12:03.000Z">
+<meta property="article:modified_time" content="2024-06-19T09:15:00.645Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lafdrew.github.io/img/%E9%A6%99%E8%95%89.png">
+  
+  
+  
+  <title>mini-L - Hexo</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"lafdrew.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>lafdrew的小站</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="mini-L"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-19 01:12" pubdate>
+          June 19, 2024 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">mini-L</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="mini-L-部分题目-longlongcall-bigbanana"><a href="#mini-L-部分题目-longlongcall-bigbanana" class="headerlink" title="mini-L 部分题目(longlongcall,bigbanana)"></a>mini-L 部分题目(longlongcall,bigbanana)</h1><h2 id="longlongcall"><a href="#longlongcall" class="headerlink" title="longlongcall"></a>longlongcall</h2><h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>64位 ELF 无壳<br><img src="/../res/mini-L_1.1.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/../res/mini-L_1.2.png" srcset="/img/loading.gif" lazyload alt="ida"><br>有大量类似这样反汇编失败的函数，是一个call&amp;ret类型的花指令,可以看出popfq和pushfq中间的才是有用的指令。</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>将无关的指令nop掉</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs idapython">import idaapi<br>import idc<br>import idautils<br><br><br># Function to search for a byte pattern and return a list of addresses where the pattern is found<br>def find_pattern(pattern):<br>    ea = 0x11D9<br>    end_ea = 0x1E35<br>    addresses = []<br><br>    while ea != idc.BADADDR:<br>        ea = idc.find_binary(ea, end_ea, pattern, 16, idc.SEARCH_DOWN)<br>        if ea != idc.BADADDR:<br>            addresses.append(ea)<br>            ea += len(pattern.split())  # Move to the next position after the pattern length<br>    return addresses<br><br><br># Function to replace a range of bytes with NOP (0x90)<br>def nop_bytes(start_addr, length):<br>    for i in range(length):<br>        idc.patch_byte(start_addr + i, 0x90)  # Replace with NOP<br><br><br># Example usage<br>binary_pattern1 = &quot;E8 02 00 00 00 &quot;  # Example pattern to search (adjust this pattern as needed)<br><br>binary_pattern5 = &quot;C9 C3&quot;<br>binary_pattern2 = &quot;48 83 C4 08&quot;<br>binary_pattern3= &quot;9C&quot;<br>binary_pattern4 = &quot;9D&quot;<br><br><br># Search for the binary pattern<br>addresses = find_pattern(binary_pattern1)<br>print(addresses)<br>pattern_length = len(binary_pattern1.split())<br>for addr in addresses:<br>    nop_bytes(addr, pattern_length)<br><br>addresses = find_pattern(binary_pattern2)<br>print(addresses)<br>pattern_length = len(binary_pattern1.split())<br>for addr in addresses:<br>    nop_bytes(addr, pattern_length)<br><br>addresses = find_pattern(binary_pattern3)<br>print(addresses)<br>pattern_length = len(binary_pattern1.split())<br>for addr in addresses:<br>    nop_bytes(addr, pattern_length)<br><br>addresses = find_pattern(binary_pattern4)<br>print(addresses)<br>pattern_length = len(binary_pattern1.split())<br>for addr in addresses:<br>    nop_bytes(addr, pattern_length)<br><br>addresses = find_pattern(binary_pattern5)<br>print(addresses)<br>pattern_length = len(binary_pattern1.split())<br>for addr in addresses:<br>    nop_bytes(addr, pattern_length)<br><br><br></code></pre></td></tr></table></figure>
+
+<p>reanalysis<br><img src="/../res/mini-L_1.3.png" srcset="/img/loading.gif" lazyload><br><img src="/../res/mini_L_1.4.png" srcset="/img/loading.gif" lazyload></p>
+<p>脚本</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-type">char</span> ida_chars[<span class="hljs-number">44</span>] =<br>&#123;<br>  <span class="hljs-number">-69</span>,<br>  <span class="hljs-number">-65</span>,<br>  <span class="hljs-number">-71</span>,<br>  <span class="hljs-number">-66</span>,<br>  <span class="hljs-number">-61</span>,<br>  <span class="hljs-number">-52</span>,<br>  <span class="hljs-number">-50</span>,<br>  <span class="hljs-number">-36</span>,<br>  <span class="hljs-number">-98</span>,<br>  <span class="hljs-number">-113</span>,<br>  <span class="hljs-number">-112</span>,<br>  <span class="hljs-number">-112</span>,<br>  <span class="hljs-number">-112</span>,<br>  <span class="hljs-number">-112</span>,<br>  <span class="hljs-number">-112</span>,<br>  <span class="hljs-number">-107</span>,<br>  <span class="hljs-number">-80</span>,<br>  <span class="hljs-number">-83</span>,<br>  <span class="hljs-number">-67</span>,<br>  <span class="hljs-number">-76</span>,<br>  <span class="hljs-number">-120</span>,<br>  <span class="hljs-number">-81</span>,<br>  <span class="hljs-number">-110</span>,<br>  <span class="hljs-number">-48</span>,<br>  <span class="hljs-number">-49</span>,<br>  <span class="hljs-number">-95</span>,<br>  <span class="hljs-number">-93</span>,<br>  <span class="hljs-number">-110</span>,<br>  <span class="hljs-number">-73</span>,<br>  <span class="hljs-number">-76</span>,<br>  <span class="hljs-number">-55</span>,<br>  <span class="hljs-number">-98</span>,<br>  <span class="hljs-number">-108</span>,<br>  <span class="hljs-number">-89</span>,<br>  <span class="hljs-number">-82</span>,<br>  <span class="hljs-number">-16</span>,<br>  <span class="hljs-number">-95</span>,<br>  <span class="hljs-number">-103</span>,<br>  <span class="hljs-number">-64</span>,<br>  <span class="hljs-number">-29</span>,<br>  <span class="hljs-number">-76</span>,<br>  <span class="hljs-number">-76</span>,<br>  <span class="hljs-number">-65</span>,<br>  <span class="hljs-number">-29</span><br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    string flag = <span class="hljs-string">&quot;&quot;</span>;    <br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">sizeof</span>(ida_chars); i+=<span class="hljs-number">2</span>)&#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> a = <span class="hljs-number">33</span>; a &lt; <span class="hljs-number">127</span>; a++)&#123;<br>            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> b = <span class="hljs-number">33</span>; b &lt; <span class="hljs-number">127</span>; b++)&#123;<br>                <span class="hljs-type">char</span> v2 = a+b;<br>                <span class="hljs-keyword">if</span>((a ^ v2) == ida_chars[i] &amp;&amp; (b^v2) == ida_chars[i+<span class="hljs-number">1</span>])&#123;<br>                    flag += a;<br>                    flag += b;<br>                   <br>                &#125;<br>    <br>            &#125;<br>        &#125;<br><br>    &#125;<br>    cout &lt;&lt; flag &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="bigbanana"><a href="#bigbanana" class="headerlink" title="bigbanana"></a>bigbanana</h2><h3 id="分析-1"><a href="#分析-1" class="headerlink" title="分析"></a>分析</h3><p>64位 无壳</p>
+<p><img src="/../res/minil2.1.png" srcset="/img/loading.gif" lazyload alt="ida"><br>很明显是一个VM的题目，先将指令都翻译成汇编指令，然后根据<br>op把指令提取出来。这里的op要改成dd的形式导出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><code class="hljs op">int instrction[] =<br>&#123;<br>   246, 108, 246, 102, 246, 71, 246, 102, 246, 13, 246<br>,102, 246, 5, 246, 102, 246, 19, 246, 102, 246, 10, 246<br>,102, 246, 70, 246, 102, 246, 2, 246, 102, 246, 9, 246<br>,102, 246, 9, 246, 102, 246, 1, 246, 102, 246, 74, 246<br>,102, 246, 21, 246, 102, 246, 3, 246, 102, 246, 18, 246<br>,102, 246, 19, 246, 102, 246, 8, 246, 102, 246, 15, 246<br>,102, 246, 11, 246, 102, 246, 70, 246, 102, 246, 3, 246<br>,102, 246, 3, 246, 102, 246, 20, 246, 102, 246, 14, 246<br>,102, 246, 18, 246, 102, 246, 70, 246, 102, 246, 20<br>,246, 102, 246, 9, 246, 102, 246, 0, 246, 102, 246, 70<br>,246, 102, 246, 2, 246, 102, 246, 3, 246, 102, 246, 21<br>,246, 102, 246, 21, 246, 102, 246, 3, 246, 102, 246<br>,20, 246, 102, 246, 22, 246, 102, 246, 70, 246, 102<br>,246, 2, 246, 102, 246, 20, 246, 102, 246, 7, 246, 102<br>,246, 14, 246, 102, 246, 70, 246, 102, 246, 3, 246, 102<br>,246, 4, 246, 102, 246, 70, 246, 102, 246, 10, 246, 102<br>,246, 10, 246, 102, 246, 15, 246, 102, 246, 17, 246<br>,102, 246, 70, 246, 102, 246, 19, 246, 102, 246, 9, 246<br>,102, 246, 31, 246, 102, 246, 70, 246, 102, 246, 74<br>,246, 102, 246, 31, 246, 102, 246, 10, 246, 102, 246<br>,18, 246, 102, 246, 5, 246, 102, 246, 3, 246, 102, 246<br>,20, 246, 102, 246, 20, 246, 102, 246, 9, 246, 102, 246<br>,5, 246, 102, 246, 8, 246, 102, 246, 15, 246, 102, 246<br>,70, 246, 102, 246, 1, 246, 102, 246, 7, 246, 102, 246<br>,10, 246, 102, 246, 0, 246, 102, 246, 70, 246, 102, 246<br>,3, 246, 102, 246, 14, 246, 102, 246, 18, 246, 102, 246<br>,70, 246, 102, 246, 20, 246, 102, 246, 3, 246, 102, 246<br>,17, 246, 102, 246, 21, 246, 102, 246, 8, 246, 102, 246<br>,7, 246, 102, 246, 70, 246, 102, 246, 19, 246, 102, 246<br>,9, 246, 102, 246, 31, 246, 102, 246, 70, 246, 102, 246<br>,0, 246, 102, 246, 47, 246, 102, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 247, 248, 243, 17, 247, 248, 243, 17<br>,247, 248, 243, 17, 247, 248, 243, 17, 247, 248, 243<br>,17, 247, 248, 243, 17, 247, 248, 243, 17, 247, 248<br>,243, 17, 247, 248, 243, 17, 247, 248, 243, 17, 247<br>,248, 243, 17, 16, 16, 248, 247, 244, 1766746445, 1<br>,1952656716, 244, 0, 243, 242, 489505807, 254, 102, 240<br>,16, 248, 244, 22, 1, 33, 244, 1131796, 243, 242, 1953788496<br>,254, 102, 240, 16, 248, 244, 33, 1, 44, 244, 2263592<br>,243, 242, 2263629, 254, 102, 240, 16, 248, 244, 44<br>,1, 11, 244, 3395388, 243, 242, 3395498, 254, 102, 240<br>,16, 248, 244, 11, 1, 22, 244, 4527184, 243, 242, 4527307<br>,254, 102, 240, 16, 248, 244, 22, 1, 33, 244, 5658980<br>,243, 242, 5658982, 254, 102, 240, 16, 248, 244, 33<br>,1, 44, 244, 6790776, 243, 242, 6791100, 254, 102, 240<br>,16, 248, 244, 44, 1, 11, 244, 7922572, 243, 242, 7922892<br>,254, 102, 240, 16, 248, 244, 11, 1, 22, 244, 9054368<br>,243, 242, 9054537, 254, 102, 240, 16, 248, 244, 22<br>,1, 33, 244, 10186164, 243, 242, 10186440, 254, 102<br>,240, 16, 248, 244, 33, 1, 44, 244, 11317960, 243, 242<br>,11318240, 254, 102, 240, 16, 248, 244, 44, 1, 11, 244<br>,12449756, 243, 242, 12450038, 254, 102, 240, 16, 248<br>,244, 11, 1, 22, 244, 13581552, 243, 242, 13581602, 254<br>,102, 240, 16, 248, 244, 22, 1, 33, 244, 14713348, 243<br>,242, 14713579, 254, 102, 240, 16, 248, 244, 33, 1, 44<br>,244, 15845144, 243, 242, 15845189, 254, 102, 240, 16<br>,248, 244, 44, 1, 11, 244, 16976940, 243, 242, 16977052<br>,254, 102, 240, 16, 248, 244, 11, 1, 22, 244, 18108736<br>,243, 242, 18108814, 254, 102, 240, 16, 248, 244, 22<br>,1, 33, 244, 19240532, 243, 242, 19240500, 254, 102<br>,240, 16, 248, 244, 33, 1, 44, 244, 20372328, 243, 242<br>,20372636, 254, 102, 240, 16, 248, 244, 44, 1, 11, 244<br>,21504124, 243, 242, 21504381, 254, 102, 240, 16, 248<br>,244, 11, 1, 22, 244, 22635920, 243, 242, 22635950, 254<br>,102, 240, 16, 248, 244, 22, 1, 33, 244, 23767716, 243<br>,242, 23767992, 254, 102, 240, 16, 248, 244, 33, 1, 44<br>,244, 24899512, 243, 242, 24899631, 254, 102, 240, 16<br>,248, 244, 44, 1, 11, 244, 26031308, 243, 242, 26031402<br>,254, 102, 240, 16, 248, 244, 11, 1, 22, 244, 27163104<br>,243, 242, 27163367, 254, 102, 240, 16, 248, 244, 22<br>,1, 33, 244, 28294900, 243, 242, 28294937, 254, 102<br>,240, 16, 248, 244, 33, 1, 44, 244, 29426696, 243, 242<br>,29426748, 254, 102, 240, 16, 248, 244, 44, 1, 11, 244<br>,30558492, 243, 242, 30558628, 254, 102, 240, 16, 248<br>,244, 11, 1, 22, 244, 31690288, 243, 242, 31690302, 254<br>,102, 240, 16, 248, 244, 22, 1, 33, 244, 32822084, 243<br>,242, 32822192, 254, 102, 240, 16, 248, 244, 33, 1, 44<br>,244, 33953880, 243, 242, 33953875, 254, 102, 240, 16<br>,248, 244, 44, 1, 11, 244, 35085676, 243, 242, 35085942<br>,254, 102, 240, 16, 248, 244, 11, 1, 22, 244, 36217472<br>,243, 242, 36217409, 254, 102, 240, 16, 248, 244, 22<br>,1, 33, 244, 37349268, 243, 242, 37349478, 254, 102<br>,240, 16, 248, 244, 33, 1, 44, 244, 38481064, 243, 242<br>,38481281, 254, 102, 240, 16, 248, 244, 44, 1, 11, 244<br>,39612860, 243, 242, 39613168, 254, 102, 240, 16, 248<br>,244, 11, 1, 22, 244, 40744656, 243, 242, 40744760, 254<br>,102, 240, 16, 248, 244, 22, 1, 33, 244, 41876452, 243<br>,242, 41876732, 254, 102, 240, 16, 248, 244, 33, 1, 44<br>,244, 43008248, 243, 242, 43008497, 254, 102, 240, 16<br>,248, 244, 44, 1, 11, 244, 44140044, 243, 242, 44140263<br>,254, 102, 240, 16, 248, 244, 11, 1, 22, 244, 45271840<br>,243, 242, 45272035, 254, 102, 240, 16, 248, 244, 22<br>,1, 33, 244, 46403636, 243, 242, 46403677, 254, 102<br>,240, 16, 248, 244, 33, 1, 44, 244, 47535432, 243, 242<br>,47535509, 254, 102, 240, 16, 248, 244, 44, 1, 11, 244<br>,48667228, 243, 242, 48667259, 254, 102, 240, 0<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>翻译脚本(这个把ida复制过来稍微改一改就行)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">trans</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-type">int</span>* op = instrction;<br>    <span class="hljs-keyword">while</span>(*op)&#123;<br>        NEXT:<br>            <br>            <br>            <span class="hljs-type">int</span> v11 = *op;<br>            <span class="hljs-type">int</span> i;<br>            <span class="hljs-keyword">switch</span>(--v11)&#123;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>                    i = *(op + <span class="hljs-number">1</span>);<br>                    <br>                    <br>                    cout &lt;&lt; <span class="hljs-string">&quot;add v6 &quot;</span> &lt;&lt; i &lt;&lt; endl;<br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">15</span>:<br>                   <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;push gatchar()&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">16</span>:<br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;printf()&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">239</span>:<br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;mov v5 v6&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">240</span>:<br>                    <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;mov v8 v6&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">241</span>:<br>                    <br>                    <br>                    i = *(op + <span class="hljs-number">1</span>);<br>                    <br>                    <br>                    cout &lt;&lt; <span class="hljs-string">&quot;cmp v5 &quot;</span> &lt;&lt; i &lt;&lt; endl;<br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">242</span>:<br>                    <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;xor v5 v6&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">243</span>:<br>                    <br>                    <br>                    <br>                    <br>                    <br>                    cout &lt;&lt; <span class="hljs-string">&quot;add v5 &quot;</span> &lt;&lt; *(op + <span class="hljs-number">1</span>)&lt;&lt; endl;<br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">244</span>:<br>                    <br>                    <br>                    cout &lt;&lt; <span class="hljs-string">&quot;add v5 &quot;</span> &lt;&lt; *(op + <span class="hljs-number">1</span>)  &lt;&lt; *(op+<span class="hljs-number">2</span>) &lt;&lt;endl;<br>                    op += <span class="hljs-number">12</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">245</span>:<br>                    <br>                    <br>                    cout &lt;&lt; <span class="hljs-string">&quot;push&quot;</span> &lt;&lt; *(op + <span class="hljs-number">1</span>)&lt;&lt; endl;<br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">246</span>:<br>                    <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;pop v5&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">247</span>:<br>                    <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;pop v6&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">248</span>:<br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;pop v7&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">249</span>:<br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;pop v8&quot;</span>);<br>                    op += <span class="hljs-number">1</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">253</span>:<br>                    <br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;big启动&quot;</span>);<br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">case</span> <span class="hljs-number">254</span>:<br>                    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;je op+ $0&quot;</span>);<br>                    <br>                    op += <span class="hljs-number">2</span>;<br>                    <span class="hljs-keyword">break</span>;<br>                <span class="hljs-keyword">default</span>:<br>                    <span class="hljs-keyword">goto</span> NEXT;<br>            &#125;<br><br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-built_in">trans</span>();<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>提取出来的汇编<br>前面一大堆push和pop不用管<br>除了前两个字符不太一样，后面的都是一样的</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs armasm"><span class="hljs-keyword">push</span> gatchar()<br><span class="hljs-keyword">push</span> gatchar()<br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">v6</span><br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">v5</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">1766746445</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v6</span> <span class="hljs-number">1952656716</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">xor</span> <span class="hljs-built_in">v5</span> <span class="hljs-built_in">v6</span><br><span class="hljs-keyword">cmp</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">489505807</span><br><span class="hljs-symbol">big</span>启动<br><br><span class="hljs-keyword">mov</span> <span class="hljs-built_in">v5</span> <span class="hljs-built_in">v6</span><br><span class="hljs-keyword">push</span> gatchar()<br><span class="hljs-keyword">pop</span> <span class="hljs-built_in">v6</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">22</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v6</span> <span class="hljs-number">33</span><br><span class="hljs-keyword">add</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">1131796</span><br><span class="hljs-symbol">xor</span> <span class="hljs-built_in">v5</span> <span class="hljs-built_in">v6</span><br><span class="hljs-keyword">cmp</span> <span class="hljs-built_in">v5</span> <span class="hljs-number">1953788496</span><br><span class="hljs-symbol">big</span>启动<br></code></pre></td></tr></table></figure>
+
+
+<p>可以先用‘m’ 和 ‘i’ 验证一下，然后把数据提取出来爆破就行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment">add v5 1766746445</span><br><span class="hljs-comment">add v6 1952656716</span><br><span class="hljs-comment">add v5 0</span><br><span class="hljs-comment">xor v5 v6</span><br><span class="hljs-comment">cmp v5 489505807</span><br><span class="hljs-comment">big启动</span><br><span class="hljs-comment">*/</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br>vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; data_ = &#123;<br>         &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">1131796</span>, <span class="hljs-number">1953788496</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">2263592</span>, <span class="hljs-number">2263629</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">3395388</span>, <span class="hljs-number">3395498</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">4527184</span>, <span class="hljs-number">4527307</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">5658980</span>, <span class="hljs-number">5658982</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">6790776</span>, <span class="hljs-number">6791100</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">7922572</span>, <span class="hljs-number">7922892</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">9054368</span>, <span class="hljs-number">9054537</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">10186164</span>, <span class="hljs-number">10186440</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">11317960</span>, <span class="hljs-number">11318240</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">12449756</span>, <span class="hljs-number">12450038</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">13581552</span>, <span class="hljs-number">13581602</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">14713348</span>, <span class="hljs-number">14713579</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">15845144</span>, <span class="hljs-number">15845189</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">16976940</span>, <span class="hljs-number">16977052</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">18108736</span>, <span class="hljs-number">18108814</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">19240532</span>, <span class="hljs-number">19240500</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">20372328</span>, <span class="hljs-number">20372636</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">21504124</span>, <span class="hljs-number">21504381</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">22635920</span>, <span class="hljs-number">22635950</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">23767716</span>, <span class="hljs-number">23767992</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">24899512</span>, <span class="hljs-number">24899631</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">26031308</span>, <span class="hljs-number">26031402</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">27163104</span>, <span class="hljs-number">27163367</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">28294900</span>, <span class="hljs-number">28294937</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">29426696</span>, <span class="hljs-number">29426748</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">30558492</span>, <span class="hljs-number">30558628</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">31690288</span>, <span class="hljs-number">31690302</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">32822084</span>, <span class="hljs-number">32822192</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">33953880</span>, <span class="hljs-number">33953875</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">35085676</span>, <span class="hljs-number">35085942</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">36217472</span>, <span class="hljs-number">36217409</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">37349268</span>, <span class="hljs-number">37349478</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">38481064</span>, <span class="hljs-number">38481281</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">39612860</span>, <span class="hljs-number">39613168</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">40744656</span>, <span class="hljs-number">40744760</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">41876452</span>, <span class="hljs-number">41876732</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">43008248</span>, <span class="hljs-number">43008497</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">44140044</span>, <span class="hljs-number">44140263</span>&#125;,<br>        &#123;<span class="hljs-number">11</span>, <span class="hljs-number">22</span>, <span class="hljs-number">45271840</span>, <span class="hljs-number">45272035</span>&#125;,<br>        &#123;<span class="hljs-number">22</span>, <span class="hljs-number">33</span>, <span class="hljs-number">46403636</span>, <span class="hljs-number">46403677</span>&#125;,<br>        &#123;<span class="hljs-number">33</span>, <span class="hljs-number">44</span>, <span class="hljs-number">47535432</span>, <span class="hljs-number">47535509</span>&#125;,<br>        &#123;<span class="hljs-number">44</span>, <span class="hljs-number">11</span>, <span class="hljs-number">48667228</span>, <span class="hljs-number">48667259</span>&#125;<br>    &#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">int</span> v5;<br>    <span class="hljs-type">int</span> v6;<br>     v5 = <span class="hljs-string">&#x27;m&#x27;</span>;<br>     v6 = <span class="hljs-string">&#x27;i&#x27;</span>;<br>     <br>     v5 += <span class="hljs-number">1766746445</span>;<br>     v6 += <span class="hljs-number">1952656716</span>;<br>   <br>    v5 = v5 ^ v6;<br>    v5 = v6;<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;mi&quot;</span>;<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; data_.<span class="hljs-built_in">size</span>(); i++)&#123;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">33</span>;j &lt;<span class="hljs-number">127</span>;j++)&#123;<br>            v6 = j;<br>            <span class="hljs-type">int</span> v5_temp = v5;<br>            v5_temp += data_[i][<span class="hljs-number">0</span>];<br>            v6 += data_[i][<span class="hljs-number">1</span>];<br>            v5_temp += data_[i][<span class="hljs-number">2</span>];<br>            <span class="hljs-keyword">if</span>((v5_temp ^ v6) == data_[i][<span class="hljs-number">3</span>])&#123;<br>                cout &lt;&lt; <span class="hljs-built_in">char</span>(j) ; <br>                v5 = v6;<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br>            <br>        &#125;<br>        <br><br>    &#125;<br>    <br>    <br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="剩下的题目之后再写"><a href="#剩下的题目之后再写" class="headerlink" title="剩下的题目之后再写"></a>剩下的题目之后再写</h3>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RE/" class="category-chain-item">RE</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>mini-L</div>
+      <div>https://lafdrew.github.io/2024/06/19/mini-L/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>John Doe</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>June 19, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/16/%E5%A4%8D%E7%8E%B0KeyHook/" title="复现KeyHook">
+                        <span class="hidden-mobile">复现KeyHook</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script>
+  <link defer rel="stylesheet" href="/css/backgroundize.css" />
+  <!-- hexo injector body_end end --></body>
+</html>
