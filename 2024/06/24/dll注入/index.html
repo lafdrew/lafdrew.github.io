@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dll注入">
+<meta property="og:url" content="https://lafdrew.github.io/2024/06/24/dll%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-06-23T16:29:13.000Z">
+<meta property="article:modified_time" content="2024-06-24T16:50:26.937Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>dll注入 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"lafdrew.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>lafdrew的小站</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="dll注入"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-24 00:29" pubdate>
+          June 24, 2024 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          447 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          4 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">dll注入</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="DLL-注入"><a href="#DLL-注入" class="headerlink" title="DLL 注入"></a>DLL 注入</h1><p>DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能</p>
+<p>DLL的实现方法</p>
+<ul>
+<li>创建远程线程(CreateRemoteThread)</li>
+<li>使用注册表(AppInit_Dlls)</li>
+<li>消息勾取(SetWindowsHookEx() API)</li>
+</ul>
+<h2 id="CreateRemoteThread"><a href="#CreateRemoteThread" class="headerlink" title="CreateRemoteThread()"></a>CreateRemoteThread()</h2><p>主程序</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// InjectDll.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-function">BOOL <span class="hljs-title">InjectDll</span><span class="hljs-params">(DWORD dwPID, LPCTSTR szDllPath)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hProcess = <span class="hljs-literal">NULL</span>, hThread = <span class="hljs-literal">NULL</span>;<br>    HMODULE hMod = <span class="hljs-literal">NULL</span>;<br>    LPVOID pRemoteBuf = <span class="hljs-literal">NULL</span>;<br><br>    <span class="hljs-comment">//确定路径需要占用的缓冲区大小</span><br>    DWORD dwBufSize = (DWORD)(_tcslen(szDllPath) + <span class="hljs-number">1</span>) * <span class="hljs-built_in">sizeof</span>(TCHAR);<br>    LPTHREAD_START_ROUTINE pThreadProc;<br><br>    <br>    <span class="hljs-keyword">if</span> (!(hProcess = <span class="hljs-built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID)))<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;OpenProcess(%d) failed!!! [%d]\n&quot;</span>, dwPID, <span class="hljs-built_in">GetLastError</span>());<br>        <span class="hljs-keyword">return</span> FALSE;<br>    &#125;<br><br>    <br>    pRemoteBuf = <span class="hljs-built_in">VirtualAllocEx</span>(hProcess, <span class="hljs-literal">NULL</span>, dwBufSize, MEM_COMMIT, PAGE_READWRITE);<br><br>    <br>    <span class="hljs-built_in">WriteProcessMemory</span>(hProcess, pRemoteBuf, (LPVOID)szDllPath, dwBufSize, <span class="hljs-literal">NULL</span>);<br><br>    <br>    hMod = <span class="hljs-built_in">GetModuleHandle</span>(<span class="hljs-string">&quot;kernel32.dll&quot;</span>);<br>    pThreadProc = (LPTHREAD_START_ROUTINE)<span class="hljs-built_in">GetProcAddress</span>(hMod, <span class="hljs-string">&quot;LoadLibraryW&quot;</span>);<br><br>   <br>    hThread = <span class="hljs-built_in">CreateRemoteThread</span>(hProcess, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, pThreadProc, pRemoteBuf, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-built_in">WaitForSingleObject</span>(hThread, INFINITE);<br><br>   <br>    <span class="hljs-built_in">CloseHandle</span>(hThread);<br>    <span class="hljs-built_in">CloseHandle</span>(hProcess);<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br><span class="hljs-type">int</span> _tmain(<span class="hljs-type">int</span> argc, TCHAR* argv[])<br>&#123;<br>    <span class="hljs-keyword">if</span> (argc != <span class="hljs-number">3</span>)<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;USAGE : %s &lt;pid&gt; &lt;dll_path&gt;\n&quot;</span>, argv[<span class="hljs-number">0</span>]);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// inject dll</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">InjectDll</span>((DWORD)_tstol(argv[<span class="hljs-number">1</span>]), argv[<span class="hljs-number">2</span>]))<br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) success!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br>    <span class="hljs-keyword">else</span><br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) failed!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>DLL download index.html </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// myhack.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> comment(lib, <span class="hljs-string">&quot;urlmon.lib&quot;</span>)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_URL             (<span class="hljs-string">&quot;http://www.naver.com/index.html&quot;</span>)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_FILE_NAME   (<span class="hljs-string">&quot;index.html&quot;</span>)</span><br><br>HMODULE g_hMod = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-function">DWORD WINAPI <span class="hljs-title">ThreadProc</span><span class="hljs-params">(LPVOID lParam)</span></span><br><span class="hljs-function"></span>&#123;<br>    TCHAR szPath[_MAX_PATH] = &#123; <span class="hljs-number">0</span>, &#125;;<br><br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">GetModuleFileName</span>(g_hMod, szPath, MAX_PATH))<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    TCHAR* p = _tcsrchr(szPath, <span class="hljs-string">&#x27;\\&#x27;</span>);<br>    <span class="hljs-keyword">if</span> (!p)<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    _tcscpy_s(p + <span class="hljs-number">1</span>, _MAX_PATH, DEF_FILE_NAME); <span class="hljs-comment">//参数准备</span><br><br>    <span class="hljs-built_in">URLDownloadToFile</span>(<span class="hljs-literal">NULL</span>, DEF_URL, szPath, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>); <span class="hljs-comment">//调用函数进行URL下载</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">DllMain</span><span class="hljs-params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hThread = <span class="hljs-literal">NULL</span>;<br><br>    g_hMod = (HMODULE)hinstDLL;<br><br>    <span class="hljs-keyword">switch</span> (fdwReason)<br>    &#123;<br>        <span class="hljs-keyword">case</span> DLL_PROCESS_ATTACH:<br>            <span class="hljs-built_in">OutputDebugString</span>(<span class="hljs-string">&quot;&lt;myhack.dll&gt; Injection!!!&quot;</span>);<br><br>           hThread = <span class="hljs-built_in">CreateThread</span>(<span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, ThreadProc, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br><br><br>         <span class="hljs-built_in">CloseHandle</span>(hThread);<br>         <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="注册表"><a href="#注册表" class="headerlink" title="注册表"></a>注册表</h2><p>windows 操作系统默认提供了AppInit_Dlls和LoadAppInit_Dlls两个注册表，当User32.dll被加载到到进程中，会读取Appinit表中的dll中，加载到进程中。所以可以利用这个特性加载任意的Dll。</p>
+<p>User32.dll是windows图形界面的主要支持。是非常常见的Dll。</p>
+<h2 id="SetWindowsHookEx"><a href="#SetWindowsHookEx" class="headerlink" title="SetWindowsHookEx()"></a>SetWindowsHookEx()</h2>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RE/" class="category-chain-item">RE</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>dll注入</div>
+      <div>https://lafdrew.github.io/2024/06/24/dll注入/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>John Doe</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>June 24, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/19/mini-L/" title="mini-L">
+                        <span class="hidden-mobile">mini-L</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script>
+  <link defer rel="stylesheet" href="/css/backgroundize.css" />
+  <!-- hexo injector body_end end --></body>
+</html>
