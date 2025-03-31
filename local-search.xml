@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>Remote Command Execution in firewall.cgi of wavlink-WL-WN579A3 Device</title>
+    <link href="/2025/03/31/Remote-Command-Execution-in-firewall-cgi-of-wavlink-WL-WN579A3-Device/"/>
+    <url>/2025/03/31/Remote-Command-Execution-in-firewall-cgi-of-wavlink-WL-WN579A3-Device/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Description"><a href="#Description" class="headerlink" title="Description:"></a><strong>Description</strong>:</h1><p>A command injection vulnerability exists in the  configuration management module’s CGI script (<code>./etc/lighttpd/www/cgi-bin/firewall.cgi</code>). .The system function executes the concatenated byte_418C74. Since byte_418C74 can be controlled, the command execution vulnerability is triggered and any command can be executed.</p><p><img src="/../res/image-20250331200919940.png" alt="image-20250331200919940"></p><h1 id="exploit："><a href="#exploit：" class="headerlink" title="exploit："></a>exploit：</h1><p>entering the main function, first verify the reference and cookie, check the logic and add environment variables to bypass</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">-E <span class="hljs-attribute">HTTP_REFERER</span>=wifi.wavlink.com<br>-E HTTP_COOIKE = <span class="hljs-attribute">session</span>=1111111111111<br></code></pre></td></tr></table></figure><p><img src="/Remote-Command-Execution-in-qos-cgi-of-wavlink-WL-WN579A3-Device-1.assets/image-20250331164323669.png" alt="image-20250331164323669"></p><p><img src="/Remote-Command-Execution-in-qos-cgi-of-wavlink-WL-WN579A3-Device-1.assets/image-20250331164356744.png" alt="image-20250331164356744"></p><p>tracking sub_4016F0 function When the user inputs the parameter firewall&#x3D;singlePortForwardDelete, the function sub_4016F0 is entered. In the sub_4016F0 function, the user input parameter del_flag is spliced into v4, and then system(v4) is executed, so we can construct a suitable v4 for attack</p><p><img src="/Remote-Command-Execution-in-qos-cgi-of-wavlink-WL-WN579A3-Device-1.assets/image-20250331201304203.png" alt="image-20250331201304203"></p><p>post_data.txt as follows:</p><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">firewall</span>=singlePortForwardDelete&amp;del_flag=<span class="hljs-comment">;ls;</span><br></code></pre></td></tr></table></figure><p>Executing within a chrooted QEMU environment:</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">sudo chroot . ./qemu-mipsel-static -E <span class="hljs-attribute">CONTENT_LENGTH</span>=1111 -cpu 74Kf  -g 1234 -E <span class="hljs-attribute">HTTP_REFERER</span>=wifi.wavlink.com -E  <span class="hljs-attribute">HTTP_COOKIE</span>=session=111111111111111  -L ./lib ./etc/lighttpd/www/cgi-bin/firewall.cgi &lt; post_data.txt<br></code></pre></td></tr></table></figure><p>Debugging confirms execution within <code>system()</code></p><p><img src="/../res/c35d02547e70712d8030433a96bfaa6e.png" alt="img"></p><p>—the resulting command assembled by the application is:</p><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mel">uci <span class="hljs-keyword">delete</span> firewall.@redirect[;<span class="hljs-keyword">ls</span>; ]<br></code></pre></td></tr></table></figure><p>This command not only executes the intended script (<code>uci delete firewall.@redirect[</code>) but also the injected <code>ls</code> command, which confirms that arbitrary command execution is possible. Given the potential for information disclosure and further system compromise, this issue is critical and should be addressed promptly.</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>cve</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Remote Command Execution in qos.cgi of wavlink-WL-WN579A3 Device</title>
     <link href="/2025/03/31/Remote-Command-Execution-in-qos-cgi-of-wavlink-WL-WN579A3-Device/"/>
     <url>/2025/03/31/Remote-Command-Execution-in-qos-cgi-of-wavlink-WL-WN579A3-Device/</url>
