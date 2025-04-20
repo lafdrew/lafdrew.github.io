@@ -23,17 +23,17 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="web_acl_mgmt_Rules_Edit_post_ruleEditNameDuring my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router. By analyzing the dispatcher file in the bin">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/202503211522484.png">
-<meta property="og:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160458235-174487709953324.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/202503211522484-17451483193002.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417160458235-174487709953324.png">
 <meta property="og:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160535663-174487713684025.png">
-<meta property="og:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160614053-174487717508626.png">
-<meta property="og:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160701648-174487722255427.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417160614053-174487717508626.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417160701648-174487722255427.png">
 <meta property="article:published_time" content="2025-04-20T09:11:41.000Z">
-<meta property="article:modified_time" content="2025-04-20T09:27:12.365Z">
+<meta property="article:modified_time" content="2025-04-20T11:25:28.074Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://lafdrew.github.io/work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/202503211522484.png">
+<meta name="twitter:image" content="https://lafdrew.github.io/res/202503211522484-17451483193002.png">
   
   
   
@@ -274,13 +274,13 @@
                 <h1 id="web-acl-mgmt-Rules-Edit-post-ruleEditName"><a href="#web-acl-mgmt-Rules-Edit-post-ruleEditName" class="headerlink" title="web_acl_mgmt_Rules_Edit_post_ruleEditName"></a>web_acl_mgmt_Rules_Edit_post_ruleEditName</h1><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router.</p>
 <p>By analyzing the dispatcher file in the bin directory, I found that the function web_acl_mgmt_Rules_Edit_postcontains a stack overflow vulnerability.</p>
 <p>The stack overflow can be triggered byruleEditName key value, which leads to a strcpy stack overflow.</p>
-<p><img src="/../../../work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/202503211522484.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
+<p><img src="/../res/202503211522484-17451483193002.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
 <p>n the main function, there is an account authentication detection. We create a cookie_0 in the tmp directory, with the content of “20 0 0”, and its function is to create a cookie with sufficient permissions to access this route.</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
 
 
 
-<p><img src="/../../../work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160458235-174487709953324.png" srcset="/img/loading.gif" lazyload alt="image-20250417160458235"></p>
+<p><img src="/../res/image-20250417160458235-174487709953324.png" srcset="/img/loading.gif" lazyload alt="image-20250417160458235"></p>
 <p><img src="/../../../work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160535663-174487713684025.png" srcset="/img/loading.gif" lazyload alt="image-20250417160535663"></p>
 <p>Through IDA, it can be seen that the stack space is 0xa0</p>
 <p>﻿The content of the <strong>poc</strong>.py file is as follows:</p>
@@ -288,8 +288,8 @@
 
 
 
-<p><img src="/../../../work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160614053-174487717508626.png" srcset="/img/loading.gif" lazyload alt="image-20250417160614053"></p>
-<p><img src="/../../../work/Planet/Planet/%E7%AC%94%E8%AE%B02.assets/image-20250417160701648-174487722255427.png" srcset="/img/loading.gif" lazyload alt="image-20250417160701648"></p>
+<p><img src="/../res/image-20250417160614053-174487717508626.png" srcset="/img/loading.gif" lazyload alt="image-20250417160614053"></p>
+<p><img src="/../res/image-20250417160701648-174487722255427.png" srcset="/img/loading.gif" lazyload alt="image-20250417160701648"></p>
 <p>Through the above image, we can see that we have overflowed to 0x558 and successfully hijacked the control flow. If necessary, more can be overflowed.</p>
 
                 

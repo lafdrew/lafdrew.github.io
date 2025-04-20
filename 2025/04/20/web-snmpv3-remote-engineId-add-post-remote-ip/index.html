@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250417110813345-174485929505312-17451404561847.png">
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250417110857449-174485933854013.png">
 <meta property="article:published_time" content="2025-04-20T09:10:00.000Z">
-<meta property="article:modified_time" content="2025-04-20T11:01:07.860Z">
+<meta property="article:modified_time" content="2025-04-20T11:26:49.282Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
@@ -275,14 +275,14 @@
                 <h1 id="web-snmpv3-remote-engineId-add-post-remote-ip"><a href="#web-snmpv3-remote-engineId-add-post-remote-ip" class="headerlink" title="web_snmpv3_remote_engineId_add_post_remote_ip"></a>web_snmpv3_remote_engineId_add_post_remote_ip</h1><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router.</p>
 <p>By analyzing the dispatcher file in the bin directory, I found that the function web_snmpv3_remote_engineId_add_post  contains a stack overflow vulnerability.</p>
 <p>The stack overflow can be triggered by remote_ip value, which leads to a memcpy stack overflow.</p>
-<p><img src="/res/202503211522484-17451404561846.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
+<p><img src="/../res/202503211522484-17451404561846.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
 <p>In the main function, there is an account authentication detection. We create a cookie_0 in the tmp directory, with the content of “20 0 0”, and its function is to create a cookie with sufficient permissions to access this route.</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
 
 
 
 <p><img src="/res/image-20250417110630394-17448591915039.png" srcset="/img/loading.gif" lazyload alt="image-20250417110630394"></p>
-<p><img src="/res/image-20250417110648157-174485920924110-17451404561845.png" srcset="/img/loading.gif" lazyload alt="image-20250417110648157"></p>
+<p><img src="/../res/image-20250417110648157-174485920924110-17451404561845.png" srcset="/img/loading.gif" lazyload alt="image-20250417110648157"></p>
 <p><img src="/res/image-20250417110742170-174485926377311.png" srcset="/img/loading.gif" lazyload alt="image-20250417110742170"></p>
 <p>Through IDA, it can be seen that the stack space is 0x178</p>
 <p>﻿The content of the <strong>poc</strong>.py file is as follows:</p>
@@ -290,8 +290,8 @@
 
 
 
-<p><img src="/res/image-20250417110813345-174485929505312-17451404561847.png" srcset="/img/loading.gif" lazyload alt="image-20250417110813345"></p>
-<p><img src="/res/image-20250417110857449-174485933854013.png" srcset="/img/loading.gif" lazyload alt="image-20250417110857449"></p>
+<p><img src="/../res/image-20250417110813345-174485929505312-17451404561847.png" srcset="/img/loading.gif" lazyload alt="image-20250417110813345"></p>
+<p><img src="/../res/image-20250417110857449-174485933854013.png" srcset="/img/loading.gif" lazyload alt="image-20250417110857449"></p>
 <p>Through the above image, we can see that we have overflowed to 0x260 and successfully hijacked the control flow. If necessary, more can be overflowed.</p>
 
                 

