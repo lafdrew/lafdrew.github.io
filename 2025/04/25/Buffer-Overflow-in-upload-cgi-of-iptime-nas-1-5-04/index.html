@@ -16,12 +16,12 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Buffer Overflow in upload.cgi of iptime_nas_1.5.04The principle of the vulnerabilityIt can be observed that the vulnerability is caused by strcpy. Since the authentication logic is executed after the">
+    <meta name="description" content="WGS-804HPT introducedWN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirements. Thi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Buffer Overflow in upload.cgi of iptime_nas_1.5.04">
 <meta property="og:url" content="https://lafdrew.github.io/2025/04/25/Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Buffer Overflow in upload.cgi of iptime_nas_1.5.04The principle of the vulnerabilityIt can be observed that the vulnerability is caused by strcpy. Since the authentication logic is executed after the">
+<meta property="og:description" content="WGS-804HPT introducedWN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirements. Thi">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250425112559057.png">
 <meta property="og:image" content="https://lafdrew.github.io/res/image-20250425112609126.png">
@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://lafdrew.github.io/res/505bded03ba362093859cf7293904187.png">
 <meta property="og:image" content="https://lafdrew.github.io/res/7ddfa109889f3cb0ce68b3c4388b4a2c.png">
 <meta property="article:published_time" content="2025-04-25T06:17:10.000Z">
-<meta property="article:modified_time" content="2025-04-25T06:39:28.158Z">
+<meta property="article:modified_time" content="2025-05-16T17:18:56.108Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="cve">
 <meta name="twitter:card" content="summary_large_image">
@@ -219,7 +219,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          57 words
+          71 words
         
       </span>
     
@@ -272,7 +272,8 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04"><a href="#Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04" class="headerlink" title="Buffer Overflow in upload.cgi of iptime_nas_1.5.04"></a>Buffer Overflow in upload.cgi of iptime_nas_1.5.04</h1><h2 id="The-principle-of-the-vulnerability"><a href="#The-principle-of-the-vulnerability" class="headerlink" title="The principle of the vulnerability"></a>The principle of the vulnerability</h2><p>It can be observed that the vulnerability is caused by strcpy. Since the authentication logic is executed after the strcpy operation, this constitutes a <strong>pre-authentication vulnerability</strong>.</p>
+                <h1 id="WGS-804HPT-introduced"><a href="#WGS-804HPT-introduced" class="headerlink" title="WGS-804HPT introduced"></a>WGS-804HPT introduced</h1><p>WN572HP3 is designed for WISP CPE and long distance wireless network, making it an ideal solution for small business offices and the home with outdoor networking requirements. This High power outdoor Wi-Fi range extender is specifically designed to provide an effective solution for outdoor wireless networking applications. With its centralized management platform and high degree of flexibility, it is the ideal choice for providing point-to-point, point-to-multipoint, and outdoor Wi-Fi coverage.</p>
+<h1 id="Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04"><a href="#Buffer-Overflow-in-upload-cgi-of-iptime-nas-1-5-04" class="headerlink" title="Buffer Overflow in upload.cgi of iptime_nas_1.5.04"></a>Buffer Overflow in upload.cgi of iptime_nas_1.5.04</h1><h2 id="The-principle-of-the-vulnerability"><a href="#The-principle-of-the-vulnerability" class="headerlink" title="The principle of the vulnerability"></a>The principle of the vulnerability</h2><p>It can be observed that the vulnerability is caused by strcpy. Since the authentication logic is executed after the strcpy operation, this constitutes a <strong>pre-authentication vulnerability</strong>.</p>
 <p><img src="/../res/image-20250425112559057.png" srcset="/img/loading.gif" lazyload alt="image-20250425112559057"></p>
 <p><img src="/../res/image-20250425112609126.png" srcset="/img/loading.gif" lazyload alt="image-20250425112609126"></p>
 <h2 id="Use-QEMU-for-simulation"><a href="#Use-QEMU-for-simulation" class="headerlink" title="Use QEMU for simulation"></a>Use QEMU for simulation</h2><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-keyword">command</span> = f&#x27;sudo chroot . <span class="hljs-string">./qemu-arm-static</span> -L <span class="hljs-string">./lib</span> -g 1234 <span class="hljs-string">./usr/webroot/upload.cgi</span>&#x27;<br></code></pre></td></tr></table></figure>
